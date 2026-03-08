@@ -4,6 +4,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 function loadLocalEnv(filePath) {
   try {
@@ -37,12 +38,18 @@ const DEFAULT_DATA_FILE = path.join(PROJECT_ROOT, 'data', 'reminder-store.json')
 const LOCAL_ENV_FILE = process.env.SP_ENV_FILE || path.join(PROJECT_ROOT, '.env.local');
 loadLocalEnv(LOCAL_ENV_FILE);
 
-const PORT = Number(process.env.SP_REMINDER_PORT || 8787);
+const PORT = Number(process.env.SP_REMINDER_PORT || 8790);
 const HOST = process.env.SP_REMINDER_HOST || '127.0.0.1';
 const API_KEY = process.env.SP_REMINDER_API_KEY || '';
 const DATA_FILE = process.env.SP_REMINDER_DATA_FILE || DEFAULT_DATA_FILE;
 const CHECK_INTERVAL_MINUTES = Number(process.env.SP_REMINDER_INTERVAL_MINUTES || 30);
 const OVERDUE_GRACE_DAYS = Number(process.env.SP_REMINDER_OVERDUE_GRACE_DAYS || 2);
+const PREFAIL_REMINDER_DAYS = Number(process.env.SP_REMINDER_PREFAIL_DAYS || 2);
+const REACTIVATE_TTL_HOURS = Number(process.env.SP_REMINDER_REACTIVATE_TTL_HOURS || 168);
+const PUBLIC_BASE_URL = String(
+  process.env.SP_REMINDER_PUBLIC_BASE_URL || `http://${HOST}:${PORT}`
+).trim().replace(/\/+$/, '');
+const REACTIVATE_SECRET = process.env.SP_REMINDER_REACTIVATE_SECRET || API_KEY || '';
 
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || '';
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || '';
@@ -74,6 +81,7 @@ function defaultStore() {
     donors: [],
     sentCycles: {},
     sentEvents: {},
+    reactivationRequests: [],
     deliveryLog: [],
     lastSyncAt: null,
     updatedAt: null
@@ -115,6 +123,11 @@ function sendJson(res, statusCode, payload) {
   const body = JSON.stringify(payload);
   res.writeHead(statusCode, { 'Content-Type': 'application/json; charset=utf-8' });
   res.end(body);
+}
+
+function sendHtml(res, statusCode, html) {
+  res.writeHead(statusCode, { 'Content-Type': 'text/html; charset=utf-8' });
+  res.end(html);
 }
 
 function setCors(res) {
@@ -255,6 +268,91 @@ function formatDateTime(value) {
   return dt.toLocaleString('en-SG', { hour12: false });
 }
 
+function startOfDay(value) {
+  const dt = value instanceof Date ? value : new Date(value);
+  return new Date(dt.getFullYear(), dt.getMonth(), dt.getDate(), 0, 0, 0, 0);
+}
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function encodeBase64Url(value) {
+  return Buffer.from(String(value || ''), 'utf8').toString('base64url');
+}
+
+function decodeBase64Url(value) {
+  return Buffer.from(String(value || ''), 'base64url').toString('utf8');
+}
+
+function buildReactivationToken({ applicationId = '', cycle = '' } = {}) {
+  if (!REACTIVATE_SECRET) return '';
+  const ttl = Math.max(1, REACTIVATE_TTL_HOURS);
+  const payload = {
+    applicationId: String(applicationId || '').trim(),
+    cycle: String(cycle || '').trim(),
+    issuedAt: Date.now(),
+    expiresAt: Date.now() + (ttl * 60 * 60 * 1000)
+  };
+  if (!payload.applicationId) return '';
+  const serialized = JSON.stringify(payload);
+  const body = encodeBase64Url(serialized);
+  const sig = crypto
+    .createHmac('sha256', REACTIVATE_SECRET)
+    .update(body)
+    .digest('base64url');
+  return `${body}.${sig}`;
+}
+
+function parseReactivationToken(token) {
+  if (!REACTIVATE_SECRET) throw new Error('Reactivation secret not configured.');
+  const raw = String(token || '').trim();
+  if (!raw || !raw.includes('.')) throw new Error('Missing or invalid token.');
+  const [body, signature] = raw.split('.', 2);
+  if (!body || !signature) throw new Error('Malformed token.');
+
+  const expected = crypto
+    .createHmac('sha256', REACTIVATE_SECRET)
+    .update(body)
+    .digest('base64url');
+  const sigBuf = Buffer.from(signature);
+  const expectedBuf = Buffer.from(expected);
+  if (sigBuf.length !== expectedBuf.length || !crypto.timingSafeEqual(sigBuf, expectedBuf)) {
+    throw new Error('Token signature is invalid.');
+  }
+
+  let payload = null;
+  try {
+    payload = JSON.parse(decodeBase64Url(body));
+  } catch (_) {
+    throw new Error('Unable to decode token payload.');
+  }
+  const applicationId = String(payload?.applicationId || '').trim();
+  const cycle = String(payload?.cycle || '').trim();
+  const expiresAt = Number(payload?.expiresAt || 0);
+  if (!applicationId || !Number.isFinite(expiresAt)) throw new Error('Token payload is incomplete.');
+  if (Date.now() > expiresAt) throw new Error('Reactivation link has expired.');
+  return { applicationId, cycle, expiresAt };
+}
+
+function buildReactivationUrl({ applicationId = '', cycle = '' } = {}) {
+  const token = buildReactivationToken({ applicationId, cycle });
+  if (!token || !PUBLIC_BASE_URL) return '';
+  return `${PUBLIC_BASE_URL}/api/reactivate?token=${encodeURIComponent(token)}`;
+}
+
+function findDonorRecordByApplicationId(store, applicationId = '') {
+  const target = String(applicationId || '').trim();
+  if (!target) return null;
+  const records = Array.isArray(store?.donors) ? store.donors : [];
+  return records.find(item => String(item?.applicationId || '').trim() === target) || null;
+}
+
 function buildEventMessage(eventType, donor, details = {}) {
   const fullName = donor.fullName || 'Donor';
   const amount = formatMoney(donor.contribution || details.amount || details.newAmount || 0);
@@ -263,6 +361,9 @@ function buildEventMessage(eventType, donor, details = {}) {
   const cycle = details.cycle || '';
   const paymentDate = formatDate(details.paymentDate || details.dueDate || '');
   const reason = details.reason || '';
+  const reactivateUrl = String(details.reactivateUrl || '').trim();
+  const graceDaysLeft = Number(details.graceDaysLeft || 0);
+  const graceDays = Number(details.graceDays || OVERDUE_GRACE_DAYS);
 
   const lines = {
     subscription_created: [
@@ -319,6 +420,15 @@ function buildEventMessage(eventType, donor, details = {}) {
       '',
       'Your coverage remains active.'
     ],
+    payment_due_soon: [
+      `Assalamualaikum ${fullName},`,
+      '',
+      `Friendly reminder: your Skim Pintar deduction is coming soon for ${cycle || 'this cycle'}.`,
+      paymentDate ? `Scheduled deduction date: ${paymentDate}` : '',
+      `Amount: ${amount}`,
+      '',
+      reactivateUrl ? `Need to keep benefits active? Tap here: ${reactivateUrl}` : ''
+    ],
     payment_missed: [
       `Assalamualaikum ${fullName},`,
       '',
@@ -326,7 +436,18 @@ function buildEventMessage(eventType, donor, details = {}) {
       paymentDate ? `Due date: ${paymentDate}` : '',
       `Amount due: ${amount}`,
       '',
-      'Please take action to avoid interruption of coverage.'
+      'Please take action to avoid interruption of coverage.',
+      reactivateUrl ? `One-click reactivation: ${reactivateUrl}` : ''
+    ],
+    payment_grace_period: [
+      `Assalamualaikum ${fullName},`,
+      '',
+      `Your account is in grace period for ${cycle || 'this cycle'}.`,
+      paymentDate ? `Original due date: ${paymentDate}` : '',
+      `Outstanding amount: ${amount}`,
+      `Grace days remaining: ${Math.max(0, graceDaysLeft)} of ${Math.max(1, graceDays)}.`,
+      '',
+      reactivateUrl ? `Reactivate now in one click: ${reactivateUrl}` : ''
     ],
     payment_overdue: [
       `Assalamualaikum ${fullName},`,
@@ -335,7 +456,8 @@ function buildEventMessage(eventType, donor, details = {}) {
       paymentDate ? `Original due date: ${paymentDate}` : '',
       `Outstanding amount: ${amount}`,
       '',
-      'Please settle this urgently to maintain benefits.'
+      'Please settle this urgently to maintain benefits.',
+      reactivateUrl ? `One-click reactivation: ${reactivateUrl}` : ''
     ],
     payment_failed: [
       `Assalamualaikum ${fullName},`,
@@ -344,7 +466,18 @@ function buildEventMessage(eventType, donor, details = {}) {
       paymentDate ? `Scheduled deduction date: ${paymentDate}` : '',
       `Amount: ${amount}`,
       '',
-      'Please update your payment details or contact support immediately.'
+      'Please update your payment details or contact support immediately.',
+      reactivateUrl ? `One-click reactivation: ${reactivateUrl}` : ''
+    ],
+    payment_reactivation_requested: [
+      `Assalamualaikum ${fullName},`,
+      '',
+      'Your one-click reactivation request has been received successfully.',
+      applicationId ? `Application ID: ${applicationId}` : '',
+      details.cycle ? `Cycle: ${details.cycle}` : '',
+      formatDateTime(details.requestedAt || details.timestamp || '') ? `Requested at: ${formatDateTime(details.requestedAt || details.timestamp || '')}` : '',
+      '',
+      'We will continue your reminder and payment protection flow.'
     ],
     notification_preference_updated: [
       `Assalamualaikum ${fullName},`,
@@ -376,9 +509,12 @@ function buildEventMessage(eventType, donor, details = {}) {
     beneficiaries_deleted: 'Skim Pintar: Beneficiaries Updated',
     donation_stopped: 'Skim Pintar: Donation Scheme Stopped',
     payment_successful: 'Skim Pintar: Payment Successful',
+    payment_due_soon: 'Skim Pintar: Deduction Reminder',
     payment_missed: 'Skim Pintar: Payment Missed',
+    payment_grace_period: 'Skim Pintar: Grace Period Alert',
     payment_overdue: 'Skim Pintar: Payment Overdue',
     payment_failed: 'Skim Pintar: Payment Failed',
+    payment_reactivation_requested: 'Skim Pintar: Reactivation Request Received',
     notification_preference_updated: 'Skim Pintar: Notification Preference Updated',
     notification_test: 'Skim Pintar: Test Notification'
   };
@@ -618,6 +754,37 @@ async function dispatchEventNotification(store, { eventType, donor, details = {}
     channelResult = { channel: normalizedDonor.notifyChannel || 'whatsapp', status: 'failed', detail: err.message };
   }
 
+  const preferredChannel = normalizeNotifyChannel(normalizedDonor.notifyChannel || '');
+  if (
+    (!channelResult || channelResult.status !== 'sent') &&
+    preferredChannel !== 'email' &&
+    hasEmailProviderConfigured() &&
+    normalizeEmail(normalizedDonor.email || '')
+  ) {
+    try {
+      const fallbackEmailResult = await sendEmailReminder(normalizedDonor.email, message.subject, message.text);
+      if (fallbackEmailResult && fallbackEmailResult.status === 'sent') {
+        channelResult = {
+          ...fallbackEmailResult,
+          channel: 'email',
+          fallbackFrom: preferredChannel || 'whatsapp'
+        };
+      } else if (channelResult && channelResult.status !== 'sent') {
+        channelResult = {
+          ...channelResult,
+          fallbackAttempt: fallbackEmailResult || { channel: 'email', status: 'skipped' }
+        };
+      }
+    } catch (fallbackErr) {
+      if (channelResult && channelResult.status !== 'sent') {
+        channelResult = {
+          ...channelResult,
+          fallbackAttempt: { channel: 'email', status: 'failed', detail: fallbackErr.message }
+        };
+      }
+    }
+  }
+
   pushDeliveryLog(store, {
     timestamp: new Date().toISOString(),
     source: source || 'event',
@@ -645,10 +812,13 @@ async function processReminders({ manual = false } = {}) {
   const store = readStore();
   const donors = Array.isArray(store.donors) ? store.donors : [];
   const now = new Date();
+  const today = startOfDay(now);
 
   let evaluated = 0;
+  let dueSoon = 0;
   let dueNow = 0;
   let missed = 0;
+  let graceNotices = 0;
   let overdue = 0;
   let failedState = 0;
   let sent = 0;
@@ -661,16 +831,30 @@ async function processReminders({ manual = false } = {}) {
     const dueDate = getDueDateForCurrentMonth(record, now);
     if (!dueDate) continue;
 
+    const dueDay = startOfDay(dueDate);
+    const daysUntilDue = Math.floor((dueDay.getTime() - today.getTime()) / 86400000);
     const daysLate = Math.floor((now.getTime() - dueDate.getTime()) / 86400000);
     const cycle = monthKey(dueDate);
+    const reactivationUrl = buildReactivationUrl({
+      applicationId: record.applicationId || '',
+      cycle
+    });
     const donor = { ...(record.donor || {}), applicationId: record.applicationId || '' };
     const baseDetails = {
       cycle,
       dueDate: dueDate.toISOString(),
-      amount: Number(donor.contribution || 0)
+      amount: Number(donor.contribution || 0),
+      reactivateUrl: reactivationUrl
     };
 
     const tasks = [];
+    if (daysUntilDue === PREFAIL_REMINDER_DAYS) {
+      dueSoon += 1;
+      tasks.push({
+        eventType: 'payment_due_soon',
+        dedupeKey: `${record.applicationId}:${cycle}:payment_due_soon:d${PREFAIL_REMINDER_DAYS}`
+      });
+    }
     if (daysLate === 0) {
       dueNow += 1;
       tasks.push({ eventType: 'payment_successful', dedupeKey: `${record.applicationId}:${cycle}:payment_successful` });
@@ -678,6 +862,17 @@ async function processReminders({ manual = false } = {}) {
     if (daysLate >= 1) {
       missed += 1;
       tasks.push({ eventType: 'payment_missed', dedupeKey: `${record.applicationId}:${cycle}:payment_missed` });
+    }
+    if (daysLate >= 1 && daysLate <= OVERDUE_GRACE_DAYS) {
+      graceNotices += 1;
+      tasks.push({
+        eventType: 'payment_grace_period',
+        dedupeKey: `${record.applicationId}:${cycle}:payment_grace_period:d${daysLate}`,
+        details: {
+          graceDays: OVERDUE_GRACE_DAYS,
+          graceDaysLeft: Math.max(0, OVERDUE_GRACE_DAYS - daysLate)
+        }
+      });
     }
     if (daysLate > OVERDUE_GRACE_DAYS) {
       overdue += 1;
@@ -692,7 +887,10 @@ async function processReminders({ manual = false } = {}) {
       const result = await dispatchEventNotification(store, {
         eventType: task.eventType,
         donor,
-        details: baseDetails,
+        details: {
+          ...baseDetails,
+          ...(task.details || {})
+        },
         dedupeKey: task.dedupeKey,
         manual,
         source: 'scheduled-cycle'
@@ -706,8 +904,10 @@ async function processReminders({ manual = false } = {}) {
   writeStore(store);
   return {
     evaluated,
+    dueSoon,
     dueNow,
     missed,
+    graceNotices,
     overdue,
     failedState,
     sent,
@@ -755,9 +955,92 @@ const server = http.createServer(async (req, res) => {
         whatsapp: Boolean(TWILIO_ACCOUNT_SID && TWILIO_AUTH_TOKEN && TWILIO_WHATSAPP_FROM),
         email: hasEmailProviderConfigured(),
         emailProvider: getEmailProvider() || null,
-        emailFrom: getEmailFromAddress() || null
+        emailFrom: getEmailFromAddress() || null,
+        prefailDays: PREFAIL_REMINDER_DAYS,
+        graceDays: OVERDUE_GRACE_DAYS,
+        reactivationLinkEnabled: Boolean(REACTIVATE_SECRET && PUBLIC_BASE_URL),
+        publicBaseUrl: PUBLIC_BASE_URL || null
       }
     });
+    return;
+  }
+
+  if (pathname === '/api/reactivate' && req.method === 'GET') {
+    const token = String(parsedUrl.searchParams.get('token') || '').trim();
+    try {
+      const decoded = parseReactivationToken(token);
+      const store = readStore();
+      const record = findDonorRecordByApplicationId(store, decoded.applicationId);
+      if (!record) {
+        sendHtml(res, 404, `
+          <html><body style="font-family:Arial,sans-serif;padding:24px">
+            <h2>Reactivation Link Not Found</h2>
+            <p>No matching donation record was found for this link.</p>
+          </body></html>
+        `);
+        return;
+      }
+
+      const cycle = decoded.cycle || monthKey(new Date());
+      const nowIso = new Date().toISOString();
+      record.updatedAt = nowIso;
+      if (record.terminatedAt) record.terminatedAt = null;
+      if (!Array.isArray(store.reactivationRequests)) store.reactivationRequests = [];
+      const requestKey = `${record.applicationId}:${cycle}`;
+      const alreadyRequested = store.reactivationRequests.some(item => String(item?.requestKey || '') === requestKey);
+      if (!alreadyRequested) {
+        store.reactivationRequests.unshift({
+          requestKey,
+          applicationId: record.applicationId || '',
+          cycle,
+          requestedAt: nowIso
+        });
+        if (store.reactivationRequests.length > STATE_MAX_LOGS) {
+          store.reactivationRequests.splice(STATE_MAX_LOGS);
+        }
+      }
+
+      if (store.sentEvents && typeof store.sentEvents === 'object') {
+        Object.keys(store.sentEvents).forEach(key => {
+          if (!key.startsWith(`${record.applicationId}:${cycle}:`)) return;
+          if (
+            key.includes(':payment_missed') ||
+            key.includes(':payment_grace_period') ||
+            key.includes(':payment_overdue') ||
+            key.includes(':payment_failed')
+          ) {
+            delete store.sentEvents[key];
+          }
+        });
+      }
+
+      await dispatchEventNotification(store, {
+        eventType: 'payment_reactivation_requested',
+        donor: { ...(record.donor || {}), applicationId: record.applicationId || '' },
+        details: { cycle, requestedAt: nowIso },
+        dedupeKey: `${record.applicationId}:${cycle}:payment_reactivation_requested`,
+        manual: true,
+        source: 'reactivation-link'
+      });
+
+      writeStore(store);
+      sendHtml(res, 200, `
+        <html><body style="font-family:Arial,sans-serif;padding:24px">
+          <h2>Reactivation Request Received</h2>
+          <p>Your Skim Pintar reactivation request has been recorded.</p>
+          <p><strong>Application ID:</strong> ${escapeHtml(record.applicationId || '')}</p>
+          <p><strong>Cycle:</strong> ${escapeHtml(cycle)}</p>
+          <p>You can now return to the app. Alerts will continue based on your updated status.</p>
+        </body></html>
+      `);
+    } catch (err) {
+      sendHtml(res, 400, `
+        <html><body style="font-family:Arial,sans-serif;padding:24px">
+          <h2>Invalid Reactivation Link</h2>
+          <p>${escapeHtml(err?.message || 'This reactivation link is invalid.')}</p>
+        </body></html>
+      `);
+    }
     return;
   }
 
@@ -847,6 +1130,7 @@ const server = http.createServer(async (req, res) => {
       donors: Array.isArray(store.donors) ? store.donors.length : 0,
       sentEvents: store.sentEvents || {},
       sentCycles: store.sentCycles || {},
+      reactivationRequests: Array.isArray(store.reactivationRequests) ? store.reactivationRequests.slice(0, 200) : [],
       logs: Array.isArray(store.deliveryLog) ? store.deliveryLog.slice(0, 200) : []
     });
     return;
@@ -858,7 +1142,7 @@ const server = http.createServer(async (req, res) => {
 server.on('error', err => {
   if (err && err.code === 'EADDRINUSE') {
     console.error(`[reminder-service] Port ${PORT} is already in use on ${HOST}.`);
-    console.error('[reminder-service] Stop the existing process or run with another port, e.g. SP_REMINDER_PORT=8788.');
+    console.error('[reminder-service] Stop the existing process or run with another port, e.g. SP_REMINDER_PORT=8791.');
     process.exit(1);
   }
   console.error('[reminder-service] Server failed to start:', err?.message || err);
@@ -876,6 +1160,12 @@ server.listen(PORT, HOST, () => {
     email: hasEmailProviderConfigured(),
     emailProvider: getEmailProvider() || null,
     emailFrom: getEmailFromAddress() || null
+  });
+  console.log('[reminder-service] alert policy:', {
+    prefailDays: PREFAIL_REMINDER_DAYS,
+    graceDays: OVERDUE_GRACE_DAYS,
+    reactivationLinkEnabled: Boolean(REACTIVATE_SECRET && PUBLIC_BASE_URL),
+    publicBaseUrl: PUBLIC_BASE_URL || null
   });
 });
 

@@ -280,6 +280,43 @@ body {
   font-weight: 900;
   flex-shrink: 0;
 }
+.home-member-benefits {
+  margin-top: 14px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--cream);
+  padding: 14px;
+}
+.home-member-benefits-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--slate);
+  margin-bottom: 6px;
+}
+.home-member-benefits ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.home-member-benefits li {
+  font-size: 14px;
+  color: var(--body);
+  line-height: 1.45;
+  padding: 3px 0;
+  display: flex;
+  gap: 8px;
+}
+.home-member-benefits li::before {
+  content: '✓';
+  color: var(--teal);
+  font-weight: 900;
+  flex-shrink: 0;
+}
+.home-member-benefits-note {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 8px;
+}
 
 /* Staff tile — full width */
 .tile.wide { grid-column: 1 / -1; flex-direction: row; text-align: left; gap: 18px; padding: 22px 24px; }
@@ -1181,6 +1218,13 @@ select.form-control {
       </div>
     </div>
     <div id="home-summary-beneficiaries" class="text-sm text-muted mt-4">Beneficiaries: —</div>
+    <div class="home-member-benefits">
+      <div id="home-summary-benefits-title" class="home-member-benefits-title">Your plan benefits</div>
+      <ul id="home-summary-benefits-list">
+        <li>Plan benefits will appear here.</li>
+      </ul>
+      <div id="home-summary-benefits-note" class="home-member-benefits-note"></div>
+    </div>
   </div>
 
   <div class="tile-grid">
@@ -1601,6 +1645,7 @@ select.form-control {
         <div id="join-success-banner-text">You will receive step-by-step WhatsApp updates. No need to call the mosque!</div>
       </div>
       <button id="join-success-track-btn" class="btn btn-primary mt-4" data-auth-only="true" onclick="go('s-track')">🔍 Track My Application</button>
+      <button id="join-success-register-btn" class="btn btn-primary mt-4" style="display:none" onclick="openRegisterAfterDonation(document.getElementById('success-app-id')?.textContent || '')">👤 Register Account Now (Optional)</button>
       <button class="btn btn-outline" style="margin-top:12px" onclick="go('s-home')">🏠 Back to Home</button>
     </div>
   </div>
@@ -1635,6 +1680,7 @@ select.form-control {
       <div>Your recurring payment setup has been recorded. You can review details in My Payments.</div>
     </div>
     <button class="btn btn-primary mt-4" data-auth-only="true" onclick="go('s-pay')">💳 View My Payments</button>
+    <button id="hitpay-confirm-register-btn" class="btn btn-primary mt-4" style="display:none" onclick="openRegisterAfterDonation()">👤 Register Account Now (Optional)</button>
     <button class="btn btn-outline" style="margin-top:12px" onclick="go('s-home')">🏠 Back to Home</button>
   </div>
 </div>
@@ -1827,6 +1873,22 @@ select.form-control {
     </form>
 
     <form id="auth-register-form" style="display:none">
+      <div style="background:var(--cream);border:2px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:14px">
+        <div style="font-size:14px;font-weight:800;color:var(--slate);margin-bottom:8px">Already donated? Auto-fill your details</div>
+        <div class="form-group" style="margin-bottom:8px">
+          <label class="form-label">NRIC / FIN</label>
+          <input id="auth-lookup-nric" class="form-control" type="text" placeholder="e.g. S1234567D" maxlength="9" inputmode="text" autocapitalize="characters" oninput="this.value=this.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,9)">
+        </div>
+        <div class="form-group" style="margin-bottom:8px">
+          <label class="form-label">Email or Mobile</label>
+          <input id="auth-lookup-contact" class="form-control" type="text" placeholder="name@email.com or 91234567" maxlength="120">
+        </div>
+        <button id="auth-lookup-btn" class="btn btn-outline btn-sm" type="button">🔎 Auto-Fill From My Donation</button>
+        <div id="auth-lookup-msg" class="text-xs text-muted" style="margin-top:8px"></div>
+      </div>
+      <input id="auth-reg-nric" type="hidden">
+      <input id="auth-reg-address" type="hidden">
+      <div id="auth-reg-claim-note" class="text-xs text-muted" style="margin-bottom:10px"></div>
       <div class="form-group">
         <label class="form-label">Full Name</label>
         <input id="auth-reg-name" class="form-control" type="text" placeholder="e.g. Ahmad Bin Ibrahim" required>
@@ -1856,6 +1918,7 @@ select.form-control {
       </div>
     </form>
 
+    <button id="auth-skip-btn" class="btn btn-outline" type="button" style="display:none;margin-top:10px" onclick="handleAuthSkip()">Skip for now</button>
     <button class="modal-close-btn" type="button" onclick="closeAuthModal()">✕ Close</button>
   </div>
 </div>
@@ -1927,9 +1990,9 @@ const ADMIN_SYNC_CHANNEL = 'skimPintar4-sync';
 const MOCK_SEED_VERSION_KEY = 'skimPintar4.mockSeed.version.v1';
 const MOCK_SEED_VERSION = '2026-03-08-v4';
 const API_BASE_URL = window.SkimPintarApiBase || 'http://localhost:8000/api';
-const REMINDER_SYNC_URL = window.SP_REMINDER_SYNC_URL || 'http://localhost:8787/api/sync/donors';
+const REMINDER_SYNC_URL = window.SP_REMINDER_SYNC_URL || 'http://localhost:8790/api/sync/donors';
 const REMINDER_SYNC_API_KEY = window.SP_REMINDER_SYNC_API_KEY || '';
-const NOTIFY_EVENT_URL = window.SP_NOTIFICATION_EVENT_URL || 'http://localhost:8787/api/notify/event';
+const NOTIFY_EVENT_URL = window.SP_NOTIFICATION_EVENT_URL || 'http://localhost:8790/api/notify/event';
 const NOTIFY_EVENT_API_KEY = window.SP_NOTIFICATION_EVENT_API_KEY || REMINDER_SYNC_API_KEY;
 const PAYMENT_SUCCESS_NOTIF_KEY = 'skimPintar4.paymentSuccessNotif.v1';
 const PAYMENT_FAILED_NOTIF_KEY = 'skimPintar4.paymentFailedNotif.v1';
@@ -2079,6 +2142,9 @@ let joinScreenMode = 'join';
 let hitPayCheckoutInFlight = false;
 let hitPayReconcileInFlight = false;
 let joinSubmitInFlight = false;
+let authModalSkipHandler = null;
+let joinGuestAuthPromptShown = false;
+let authRegisterClaimContext = null;
 let serverSyncEnabled = false;
 let serverBootstrapLoaded = false;
 let suppressServerPersist = false;
@@ -2321,7 +2387,7 @@ function getNotificationServiceHealthUrl() {
     const apiUrl = new URL(NOTIFY_EVENT_URL, window.location.href);
     return `${apiUrl.origin}/health`;
   } catch (_) {
-    return 'http://127.0.0.1:8787/health';
+    return 'http://127.0.0.1:8790/health';
   }
 }
 
@@ -2619,6 +2685,40 @@ function setAuthMessage(message, tone = 'info') {
   el.textContent = message;
 }
 
+function setAuthLookupMessage(message = '', tone = 'muted') {
+  const el = document.getElementById('auth-lookup-msg');
+  if (!el) return;
+  el.textContent = message || '';
+  if (!message) {
+    el.style.color = 'var(--muted)';
+    return;
+  }
+  if (tone === 'success') {
+    el.style.color = 'var(--success)';
+    return;
+  }
+  if (tone === 'error') {
+    el.style.color = 'var(--danger)';
+    return;
+  }
+  el.style.color = 'var(--muted)';
+}
+
+function setAuthRegisterClaimContext(context = null) {
+  authRegisterClaimContext = context && typeof context === 'object'
+    ? { ...context }
+    : null;
+  const nricInput = document.getElementById('auth-reg-nric');
+  const addressInput = document.getElementById('auth-reg-address');
+  const note = document.getElementById('auth-reg-claim-note');
+  if (nricInput) nricInput.value = authRegisterClaimContext?.nric || '';
+  if (addressInput) addressInput.value = authRegisterClaimContext?.address || '';
+  if (!note) return;
+  note.textContent = authRegisterClaimContext?.applicationId
+    ? `Linked to donation record ${authRegisterClaimContext.applicationId}.`
+    : '';
+}
+
 function setAuthMode(mode) {
   authMode = mode === 'register' ? 'register' : 'login';
   const loginForm = document.getElementById('auth-login-form');
@@ -2632,9 +2732,22 @@ function setAuthMode(mode) {
   tabRegister.classList.toggle('active', authMode === 'register');
 }
 
-function openAuthModal(mode = 'login', message = '') {
+function openAuthModal(mode = 'login', message = '', options = {}) {
   setAuthMode(mode);
   setAuthMessage(message || '');
+  const skipBtn = document.getElementById('auth-skip-btn');
+  const allowSkip = Boolean(options?.allowSkip);
+  authModalSkipHandler = allowSkip && typeof options?.onSkip === 'function'
+    ? options.onSkip
+    : null;
+  if (skipBtn) {
+    skipBtn.style.display = allowSkip ? 'block' : 'none';
+    skipBtn.textContent = options?.skipLabel || 'Skip for now';
+  }
+  if (options?.clearLookup !== false) {
+    setAuthLookupMessage('');
+    setAuthRegisterClaimContext(null);
+  }
   const modal = document.getElementById('auth-modal');
   if (modal) modal.classList.add('open');
 }
@@ -2642,12 +2755,29 @@ function openAuthModal(mode = 'login', message = '') {
 function closeAuthModal() {
   const modal = document.getElementById('auth-modal');
   if (modal) modal.classList.remove('open');
+  authModalSkipHandler = null;
+  const skipBtn = document.getElementById('auth-skip-btn');
+  if (skipBtn) skipBtn.style.display = 'none';
+}
+
+function handleAuthSkip() {
+  if (!authModalSkipHandler) {
+    closeAuthModal();
+    return;
+  }
+  const nextAction = authModalSkipHandler;
+  closeAuthModal();
+  try {
+    nextAction();
+  } catch (_) {}
 }
 
 function updateAuthUi() {
   const openBtn = document.getElementById('auth-open-btn');
   const userPill = document.getElementById('auth-user-pill');
   const userName = document.getElementById('auth-user-name');
+  const joinSuccessRegisterBtn = document.getElementById('join-success-register-btn');
+  const hitpayConfirmRegisterBtn = document.getElementById('hitpay-confirm-register-btn');
   if (!openBtn || !userPill || !userName) return;
 
   if (authCurrentUser) {
@@ -2655,11 +2785,14 @@ function updateAuthUi() {
     userPill.style.display = 'inline-flex';
     userName.textContent = getShortName(authCurrentUser);
     prefillJoinFromUser(authCurrentUser);
+    joinGuestAuthPromptShown = false;
   } else {
     openBtn.style.display = 'inline-flex';
     userPill.style.display = 'none';
     userName.textContent = '';
   }
+  if (joinSuccessRegisterBtn) joinSuccessRegisterBtn.style.display = authCurrentUser ? 'none' : 'block';
+  if (hitpayConfirmRegisterBtn) hitpayConfirmRegisterBtn.style.display = authCurrentUser ? 'none' : 'block';
 
   updateHomeTileAccess();
   refreshProtectedViews();
@@ -3907,12 +4040,41 @@ function refreshHomeMembershipSummary() {
   const last = document.getElementById('home-summary-last-payment');
   const next = document.getElementById('home-summary-next-payment');
   const benef = document.getElementById('home-summary-beneficiaries');
+  const benefitsTitle = document.getElementById('home-summary-benefits-title');
+  const benefitsList = document.getElementById('home-summary-benefits-list');
+  const benefitsNote = document.getElementById('home-summary-benefits-note');
+  const plus = isPlusMembership(latest);
+  const planBenefits = plus
+    ? [
+      'Free funeral services',
+      'Ritual bathing and shrouding support',
+      'Burial and transport support',
+      '20% discount for courses',
+      'Up to 10 same-address family members',
+      'Parents and parents-in-law at different address',
+      'Extended family coverage support'
+    ]
+    : [
+      'Free funeral services',
+      'Ritual bathing and shrouding support',
+      'Burial and transport support',
+      '20% discount for courses'
+    ];
 
   if (plan) plan.textContent = ended ? `${donor.group || 'Skim Pintar'} (Ended)` : (donor.group || 'Skim Pintar');
   if (appId) appId.textContent = `Application ID: ${latest.applicationId || '—'}`;
   if (last) last.textContent = lastDate;
   if (next) next.textContent = nextDate;
   if (benef) benef.textContent = `Beneficiaries linked: ${beneficiaries}`;
+  if (benefitsTitle) benefitsTitle.textContent = plus ? 'Your Skim Pintar Plus benefits' : 'Your Skim Pintar Basic benefits';
+  if (benefitsList) benefitsList.innerHTML = planBenefits.map(item => `<li>${esc(item)}</li>`).join('');
+  if (benefitsNote) {
+    benefitsNote.textContent = ended
+      ? 'Scheme ended: benefits are paused until reactivation.'
+      : (oneTime
+        ? 'One-time payment mode: make payment promptly to keep coverage active.'
+        : 'Benefits stay active while monthly contributions are up to date.');
+  }
 
   aboutCard.style.display = 'none';
   summaryCard.style.display = 'block';
@@ -4371,6 +4533,153 @@ function prefillJoinFromUser(user) {
   if (hitpayModeEl && !hitpayModeEl.value) hitpayModeEl.value = 'recurring';
 }
 
+function getDonorRecordsSortedNewest() {
+  return getDonorRecords()
+    .slice()
+    .sort((a, b) => new Date(b?.updatedAt || b?.submittedAt || 0) - new Date(a?.updatedAt || a?.submittedAt || 0));
+}
+
+function findDonationRecordByApplicationId(applicationId = '') {
+  const target = String(applicationId || '').trim();
+  if (!target) return null;
+  const records = getDonorRecords();
+  return records.find(record => String(record?.applicationId || '').trim() === target) || null;
+}
+
+function findDonationRecordByNricAndContact({ nric = '', contact = '' } = {}) {
+  const targetNric = normalizeNric(nric);
+  const rawContact = String(contact || '').trim();
+  if (!targetNric || !rawContact) return null;
+
+  const contactLooksEmail = rawContact.includes('@');
+  const targetEmail = contactLooksEmail ? normalizeEmail(rawContact) : '';
+  const targetPhone = normalizePhone(rawContact);
+  if (!targetEmail && !targetPhone) return null;
+
+  const records = getDonorRecordsSortedNewest();
+  for (const record of records) {
+    const donor = record?.donor || {};
+    const donorNric = normalizeNric(donor.nric || donor.nricNormalized || '');
+    if (!donorNric || donorNric !== targetNric) continue;
+    const donorEmail = normalizeEmail(donor.email || '');
+    const donorPhone = normalizePhone(donor.mobile || '');
+    const emailMatched = targetEmail && donorEmail && donorEmail === targetEmail;
+    const phoneMatched = targetPhone && donorPhone && donorPhone === targetPhone;
+    if (emailMatched || phoneMatched) return record;
+  }
+  return null;
+}
+
+function prefillRegisterFromDonationRecord(record, options = {}) {
+  if (!record) return false;
+  const donor = record?.donor || {};
+  const nric = normalizeNric(donor.nric || donor.nricNormalized || '');
+  const email = normalizeEmail(donor.email || '');
+  const mobile = normalizePhone(donor.mobile || '');
+  const name = String(donor.fullName || '').trim();
+  const address = String(donor.address || '').trim();
+  const overwrite = Boolean(options?.overwrite);
+
+  const nameEl = document.getElementById('auth-reg-name');
+  const mobileEl = document.getElementById('auth-reg-mobile');
+  const emailEl = document.getElementById('auth-reg-email');
+  if (nameEl && (overwrite || !nameEl.value.trim()) && name) nameEl.value = name;
+  if (mobileEl && (overwrite || !mobileEl.value.trim()) && mobile) mobileEl.value = mobile;
+  if (emailEl && (overwrite || !emailEl.value.trim()) && email) emailEl.value = email;
+
+  setAuthRegisterClaimContext({
+    applicationId: record.applicationId || '',
+    nric,
+    email,
+    mobile,
+    address
+  });
+  return true;
+}
+
+function resolveDonationRecordForRegistration(applicationId = '') {
+  const direct = findDonationRecordByApplicationId(applicationId);
+  if (direct) return direct;
+
+  const confirmation = safeReadJson(HITPAY_CONFIRMATION_KEY, null) || {};
+  const candidateIds = [
+    confirmation.applicationId,
+    resolveHitPayStatusId(confirmation),
+    confirmation.reference,
+    confirmation.referenceNumber
+  ];
+  for (const candidate of candidateIds) {
+    const found = findDonationRecordByApplicationId(candidate);
+    if (found) return found;
+  }
+
+  const records = getDonorRecordsSortedNewest();
+  return records.length ? records[0] : null;
+}
+
+function openRegisterAfterDonation(applicationId = '') {
+  openAuthModal(
+    'register',
+    'You can register now, or close this popup and continue as guest.',
+    { clearLookup: true }
+  );
+  const record = resolveDonationRecordForRegistration(applicationId);
+  if (!record) {
+    setAuthLookupMessage('No donation record found to auto-fill. You can still register manually.', 'info');
+    return;
+  }
+  if (prefillRegisterFromDonationRecord(record, { overwrite: false })) {
+    setAuthLookupMessage(`Details loaded from ${record.applicationId || 'your donation record'}.`, 'success');
+  }
+}
+
+function linkDonationRecordsToUser(user, claimContext = null) {
+  if (!user) return { linked: 0, changed: false };
+  const targetNric = normalizeNric(claimContext?.nric || user.nric || '');
+  if (!targetNric) return { linked: 0, changed: false };
+
+  const targetEmail = normalizeEmail(claimContext?.email || user.email || '');
+  const targetPhone = normalizePhone(claimContext?.mobile || user.mobile || '');
+  const records = getDonorRecords();
+  let linked = 0;
+  let changed = false;
+
+  records.forEach(record => {
+    if (!record || !record.donor) return;
+
+    const donor = record.donor;
+    const donorNric = normalizeNric(donor.nric || donor.nricNormalized || '');
+    if (!donorNric || donorNric !== targetNric) return;
+
+    const donorEmail = normalizeEmail(donor.email || '');
+    const donorPhone = normalizePhone(donor.mobile || '');
+    const contactMatched = (
+      (targetEmail && donorEmail && donorEmail === targetEmail) ||
+      (targetPhone && donorPhone && donorPhone === targetPhone) ||
+      (!targetEmail && !targetPhone)
+    );
+    if (!contactMatched) return;
+
+    linked += 1;
+    const nextProvider = user.provider || donor.authProvider || 'local';
+    const nextEmail = normalizeEmail(user.email || donor.authUserEmail || '');
+    if (
+      donor.authUserId !== user.id ||
+      donor.authUserEmail !== nextEmail ||
+      donor.authProvider !== nextProvider
+    ) {
+      donor.authUserId = user.id;
+      donor.authUserEmail = nextEmail;
+      donor.authProvider = nextProvider;
+      record.updatedAt = new Date().toISOString();
+      changed = true;
+    }
+  });
+
+  if (changed) saveDonorRecords(records);
+  return { linked, changed };
+}
+
 function ensureMemberDirectoryFromAuthUsers(users) {
   const list = Array.isArray(users) ? users : [];
   const members = getMemberDirectory();
@@ -4485,10 +4794,63 @@ async function handleLoginSubmit(event) {
 
   authCurrentUser = user;
   setSession(user.id);
+  linkDonationRecordsToUser(user, {
+    nric: user.nric || '',
+    email: user.email || '',
+    mobile: user.mobile || ''
+  });
   upsertMemberDirectoryFromUser(user, 'login');
   recordAuthEvent('login', user, 'password');
   updateAuthUi();
   closeAuthModal();
+}
+
+function handleRegisterDonationLookup() {
+  const nricEl = document.getElementById('auth-lookup-nric');
+  const contactEl = document.getElementById('auth-lookup-contact');
+  if (!nricEl || !contactEl) return;
+
+  const nric = normalizeNric(nricEl.value).slice(0, 9);
+  const rawContact = String(contactEl.value || '').trim();
+  const contactLooksEmail = rawContact.includes('@');
+  const contactEmail = contactLooksEmail ? normalizeEmail(rawContact) : '';
+  const contactPhone = normalizePhone(rawContact);
+  nricEl.value = nric;
+  contactEl.value = rawContact;
+
+  if (!nric || !rawContact) {
+    setAuthLookupMessage('Enter NRIC and either email or mobile number.', 'error');
+    return;
+  }
+  if (!isValidNricFormat(nric) || !isValidNricChecksum(nric)) {
+    setAuthLookupMessage('Please enter a valid NRIC/FIN with correct checksum.', 'error');
+    return;
+  }
+  if (contactLooksEmail) {
+    if (!isValidEmailFormat(contactEmail)) {
+      setAuthLookupMessage('Please enter a valid email address.', 'error');
+      return;
+    }
+  } else if (!/^\d{8,12}$/.test(contactPhone)) {
+    setAuthLookupMessage('Mobile number must contain 8 to 12 digits.', 'error');
+    return;
+  }
+
+  const record = findDonationRecordByNricAndContact({ nric, contact: rawContact });
+  if (!record) {
+    setAuthLookupMessage('No matching donation record was found for these details.', 'error');
+    return;
+  }
+
+  prefillRegisterFromDonationRecord(record, { overwrite: true });
+  setAuthRegisterClaimContext({
+    ...(authRegisterClaimContext || {}),
+    nric,
+    email: contactEmail || authRegisterClaimContext?.email || '',
+    mobile: contactPhone || authRegisterClaimContext?.mobile || ''
+  });
+  setAuthLookupMessage(`Details loaded from ${record.applicationId || 'your donation record'}. Complete password to finish registration.`, 'success');
+  setAuthMessage('Donation details matched. Finish account creation below.', 'success');
 }
 
 async function handleRegisterSubmit(event) {
@@ -4498,6 +4860,8 @@ async function handleRegisterSubmit(event) {
   const email = normalizeEmail(document.getElementById('auth-reg-email').value);
   const password = document.getElementById('auth-reg-password').value;
   const confirm = document.getElementById('auth-reg-confirm').value;
+  const nric = normalizeNric(document.getElementById('auth-reg-nric')?.value || authRegisterClaimContext?.nric || '');
+  const address = String(document.getElementById('auth-reg-address')?.value || authRegisterClaimContext?.address || '').trim();
 
   if (!name || !mobile || !email || !password) {
     setAuthMessage('Please complete all required fields.', 'error');
@@ -4524,15 +4888,20 @@ async function handleRegisterSubmit(event) {
     email,
     notifyChannel: userCanUseNotifyChannel({ mobile, email }, 'whatsapp') ? 'whatsapp' : 'email',
     passwordHash: await hashPassword(password),
+    nric,
+    address,
     createdAt: new Date().toISOString()
   };
   authUsers.push(newUser);
   saveUsers();
+  linkDonationRecordsToUser(newUser, authRegisterClaimContext);
   upsertMemberDirectoryFromUser(newUser, 'register');
   recordAuthEvent('register', newUser, 'local-form');
 
   authCurrentUser = newUser;
   setSession(newUser.id);
+  setAuthRegisterClaimContext(null);
+  setAuthLookupMessage('');
   updateAuthUi();
   closeAuthModal();
 }
@@ -4546,6 +4915,11 @@ async function continueWithSingpass() {
   const existingUser = findUserBySingpassIdentity(SINGPASS_DEMO_PROFILE);
   const user = upsertSingpassUser({ ...SINGPASS_DEMO_PROFILE });
   const eventType = existingUser ? 'login' : 'register';
+  linkDonationRecordsToUser(user, {
+    nric: user.nric || '',
+    email: user.email || '',
+    mobile: user.mobile || ''
+  });
   upsertMemberDirectoryFromUser(user, eventType);
   recordAuthEvent(eventType, user, 'singpass-demo');
   authCurrentUser = user;
@@ -4607,6 +4981,11 @@ async function handleSingpassCallback() {
     const existingUser = findUserBySingpassIdentity(singpassProfile);
     const user = upsertSingpassUser(singpassProfile);
     const eventType = existingUser ? 'login' : 'register';
+    linkDonationRecordsToUser(user, {
+      nric: user.nric || '',
+      email: user.email || '',
+      mobile: user.mobile || ''
+    });
     upsertMemberDirectoryFromUser(user, eventType);
     recordAuthEvent(eventType, user, 'singpass-oidc');
 
@@ -4646,6 +5025,7 @@ function initAuth(options = {}) {
   document.getElementById('auth-switch-to-login').addEventListener('click', () => setAuthMode('login'));
   document.getElementById('auth-login-form').addEventListener('submit', handleLoginSubmit);
   document.getElementById('auth-register-form').addEventListener('submit', handleRegisterSubmit);
+  document.getElementById('auth-lookup-btn').addEventListener('click', handleRegisterDonationLookup);
   document.getElementById('auth-login-singpass').addEventListener('click', continueWithSingpass);
   document.getElementById('auth-register-singpass').addEventListener('click', continueWithSingpass);
 
@@ -4734,6 +5114,7 @@ function prefillJoinFromMembership(record) {
 
 function prepareJoinScreen() {
   joinScreenMode = getJoinMode();
+  joinGuestAuthPromptShown = false;
   applyJoinModeUi();
   joinStep(1);
   pickPay('egiro');
@@ -5520,7 +5901,8 @@ function validatePaymentSetup() {
   return validateEgiroForm();
 }
 
-function joinStep(n) {
+function joinStep(n, options = {}) {
+  const skipGuestPrompt = Boolean(options?.skipGuestPrompt);
   if ([2,3,4].includes(n)) {
     const contribution = getContributionAmount();
     const tier = classifyTierByContribution(contribution);
@@ -5530,8 +5912,14 @@ function joinStep(n) {
     }
     pickTier(tier, true);
   }
-  if (n >= 3 && !authCurrentUser) {
-    openAuthModal('register', 'Please register or login before payment setup so your application can be linked to your profile.');
+  if (n >= 3 && !authCurrentUser && !joinGuestAuthPromptShown && !skipGuestPrompt) {
+    joinGuestAuthPromptShown = true;
+    openAuthModal('register', 'You can register now, or skip and continue donating as guest. You can create your account after payment using NRIC + email/phone.', {
+      allowSkip: true,
+      skipLabel: 'Skip and continue as guest',
+      onSkip: () => joinStep(n, { skipGuestPrompt: true }),
+      clearLookup: true
+    });
     return;
   }
   if ([3,4].includes(n) && !validateJoinPersonalDetails()) return;
@@ -5608,10 +5996,6 @@ function showJoinSubmissionSuccess(saved) {
 
 async function submitJoin() {
   if (joinSubmitInFlight) return;
-  if (!authCurrentUser) {
-    openAuthModal('register', 'Please register or login before submission so we can tag this application to your profile.');
-    return;
-  }
   const contribution = getContributionAmount();
   const tier = classifyTierByContribution(contribution);
   if (!tier) {
@@ -5733,7 +6117,7 @@ ABOUT SKIM PINTAR:
 - Old process: 21–30 day paper GIRO; New process: under 7 days via SingPass + eGIRO/HitPay setup
 - Payment: eGIRO recurring, or HitPay recurring/one-time
 - No cryptocurrency, no riba — MAS compliant
-- Members notified before any failed deduction; 30-day grace period; easy reactivation
+- Members notified before failed deductions, during grace period, and can use one-click reactivation
 
 NAVIGATION: If user wants to navigate, end your response with [NAV:pageid] where pageid is one of: s-home, s-join, s-track, s-pay, s-hitpay-confirm, s-alerts, s-beneficiaries, s-end-scheme
 

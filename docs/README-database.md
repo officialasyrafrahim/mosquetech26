@@ -89,9 +89,16 @@ Optional browser runtime config (before app script loads):
 
 ```html
 <script>
-  window.SP_REMINDER_SYNC_URL = 'http://localhost:8787/api/sync/donors';
+  window.SP_REMINDER_SYNC_URL = 'http://localhost:8790/api/sync/donors';
   window.SP_REMINDER_SYNC_API_KEY = 'change-this-secret';
-  window.SP_NOTIFICATION_EVENT_URL = 'http://localhost:8787/api/notify/event';
+  window.SP_NOTIFICATION_EVENT_URL = 'http://localhost:8790/api/notify/event';
   window.SP_NOTIFICATION_EVENT_API_KEY = 'change-this-secret';
 </script>
 ```
+
+Reminder backend now supports:
+
+- pre-deduction reminders (`payment_due_soon`)
+- grace period reminders (`payment_grace_period`)
+- one-click reactivation links (`/api/reactivate?token=...`)
+- email fallback when WhatsApp/SMS is unavailable and email is configured

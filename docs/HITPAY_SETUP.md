@@ -55,5 +55,5 @@ Then open:
 
 ## Validation and flow updates
 - HitPay payment confirmation page now also shows the Skim Pintar `Status ID` (application ID).
-- Join flow requires login/register before entering payment setup, so submissions are tagged to user profile.
+- Join flow now allows guest donation after Step 2 (registration popup still appears with a skip option), and users can register after payment using NRIC + email/phone to auto-fill account data.
 - Personal details validation now includes NRIC checksum and duplicate-data conflict checks (NRIC, email, mobile).

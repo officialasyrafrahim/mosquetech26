@@ -388,9 +388,9 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
 const API_BASE_URL = window.SkimPintarApiBase || 'http://localhost:8000/api';
-const REMINDER_SYNC_URL = window.SP_REMINDER_SYNC_URL || 'http://localhost:8787/api/sync/donors';
+const REMINDER_SYNC_URL = window.SP_REMINDER_SYNC_URL || 'http://localhost:8790/api/sync/donors';
 const REMINDER_SYNC_API_KEY = window.SP_REMINDER_SYNC_API_KEY || '';
-const NOTIFY_EVENT_URL = window.SP_NOTIFICATION_EVENT_URL || 'http://localhost:8787/api/notify/event';
+const NOTIFY_EVENT_URL = window.SP_NOTIFICATION_EVENT_URL || 'http://localhost:8790/api/notify/event';
 const NOTIFY_EVENT_API_KEY = window.SP_NOTIFICATION_EVENT_API_KEY || REMINDER_SYNC_API_KEY;
 const NOTIFY_CHANNELS = ['whatsapp', 'sms', 'email'];
 const DONOR_RECORDS_KEY = 'skimPintar4.donorRecords.v1';

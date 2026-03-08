@@ -92,7 +92,7 @@ node backend/reminder-service.js
 Reminder health check:
 
 ```bash
-curl http://localhost:8787/health
+curl http://localhost:8790/health
 ```
 
 ## Environment file (`.env.local`)
@@ -106,10 +106,18 @@ Common values:
 ```env
 # Reminder service protection key
 SP_REMINDER_API_KEY=change-this-secret
+SP_REMINDER_PORT=8790
+SP_REMINDER_PREFAIL_DAYS=2
+SP_REMINDER_OVERDUE_GRACE_DAYS=2
 
 # Optional email provider for reminders
 RESEND_API_KEY=re_xxxxxxxxxxxxx
 EMAIL_FROM=Skim Pintar <noreply@yourdomain.com>
+
+# Optional: one-click reactivation links in reminder messages
+# Use your public URL (for example your ngrok URL)
+SP_REMINDER_PUBLIC_BASE_URL=https://your-public-url.example
+SP_REMINDER_REACTIVATE_SECRET=change-this-reactivation-secret
 ```
 
 ## Optional: enable real HitPay

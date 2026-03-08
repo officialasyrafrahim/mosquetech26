@@ -223,7 +223,358 @@
       "channel": "email"
     }
   },
+  "reactivationRequests": [],
   "deliveryLog": [
+    {
+      "timestamp": "2026-03-08T05:07:43.071Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-2026-1251:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-2026-1251",
+      "donorName": "Nur Aisyah Binte Rahman",
+      "donorNric": "S8123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (403): {\"statusCode\":403,\"name\":\"validation_error\",\"message\":\"You can only send testing emails to your own email address (adilhadizul@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\"}"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-03-08T05:07:42.042Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-2026-1251:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-2026-1251",
+      "donorName": "Nur Aisyah Binte Rahman",
+      "donorNric": "S8123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (429): {\"statusCode\":429,\"name\":\"rate_limit_exceeded\",\"message\":\"Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.\"}"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-03-08T05:07:41.631Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-MOCK-2004:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-MOCK-2004",
+      "donorName": "Siti Mariam Bte Osman",
+      "donorNric": "T1122334D",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (403): {\"statusCode\":403,\"name\":\"validation_error\",\"message\":\"You can only send testing emails to your own email address (adilhadizul@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\"}"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-03-08T05:07:41.253Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-MOCK-2004:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-MOCK-2004",
+      "donorName": "Siti Mariam Bte Osman",
+      "donorNric": "T1122334D",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (403): {\"statusCode\":403,\"name\":\"validation_error\",\"message\":\"You can only send testing emails to your own email address (adilhadizul@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\"}"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-03-08T05:07:40.922Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-MOCK-2002:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-MOCK-2002",
+      "donorName": "Nur Ain Bte Salleh",
+      "donorNric": "T0345678B",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (429): {\"statusCode\":429,\"name\":\"rate_limit_exceeded\",\"message\":\"Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.\"}"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-03-08T05:07:40.600Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-MOCK-2002:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-MOCK-2002",
+      "donorName": "Nur Ain Bte Salleh",
+      "donorNric": "T0345678B",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (403): {\"statusCode\":403,\"name\":\"validation_error\",\"message\":\"You can only send testing emails to your own email address (adilhadizul@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\"}"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-03-08T05:07:40.239Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-MOCK-2001:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-MOCK-2001",
+      "donorName": "Ahmad Bin Yusof",
+      "donorNric": "S9123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (403): {\"statusCode\":403,\"name\":\"validation_error\",\"message\":\"You can only send testing emails to your own email address (adilhadizul@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\"}"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-03-08T05:07:39.078Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-MOCK-2001:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-MOCK-2001",
+      "donorName": "Ahmad Bin Yusof",
+      "donorNric": "S9123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (429): {\"statusCode\":429,\"name\":\"rate_limit_exceeded\",\"message\":\"Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.\"}"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-03-08T05:07:38.662Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-2026-1250:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-2026-1250",
+      "donorName": "Nur Aisyah Binte Rahman",
+      "donorNric": "S8123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (403): {\"statusCode\":403,\"name\":\"validation_error\",\"message\":\"You can only send testing emails to your own email address (adilhadizul@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\"}"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-03-08T05:07:38.264Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-2026-1250:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-2026-1250",
+      "donorName": "Nur Aisyah Binte Rahman",
+      "donorNric": "S8123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (403): {\"statusCode\":403,\"name\":\"validation_error\",\"message\":\"You can only send testing emails to your own email address (adilhadizul@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\"}"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-03-08T04:46:43.151Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-2026-1251:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-2026-1251",
+      "donorName": "Nur Aisyah Binte Rahman",
+      "donorNric": "S8123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    },
+    {
+      "timestamp": "2026-03-08T04:46:43.150Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-2026-1251:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-2026-1251",
+      "donorName": "Nur Aisyah Binte Rahman",
+      "donorNric": "S8123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    },
+    {
+      "timestamp": "2026-03-08T04:46:43.150Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-MOCK-2004:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-MOCK-2004",
+      "donorName": "Siti Mariam Bte Osman",
+      "donorNric": "T1122334D",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    },
+    {
+      "timestamp": "2026-03-08T04:46:43.150Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-MOCK-2004:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-MOCK-2004",
+      "donorName": "Siti Mariam Bte Osman",
+      "donorNric": "T1122334D",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    },
+    {
+      "timestamp": "2026-03-08T04:46:43.150Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-MOCK-2002:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-MOCK-2002",
+      "donorName": "Nur Ain Bte Salleh",
+      "donorNric": "T0345678B",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    },
+    {
+      "timestamp": "2026-03-08T04:46:43.150Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-MOCK-2002:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-MOCK-2002",
+      "donorName": "Nur Ain Bte Salleh",
+      "donorNric": "T0345678B",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    },
+    {
+      "timestamp": "2026-03-08T04:46:43.149Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-MOCK-2001:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-MOCK-2001",
+      "donorName": "Ahmad Bin Yusof",
+      "donorNric": "S9123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    },
+    {
+      "timestamp": "2026-03-08T04:46:43.149Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-MOCK-2001:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-MOCK-2001",
+      "donorName": "Ahmad Bin Yusof",
+      "donorNric": "S9123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    },
+    {
+      "timestamp": "2026-03-08T04:46:43.149Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-2026-1250:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-2026-1250",
+      "donorName": "Nur Aisyah Binte Rahman",
+      "donorNric": "S8123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    },
+    {
+      "timestamp": "2026-03-08T04:46:43.149Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-2026-1250:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-2026-1250",
+      "donorName": "Nur Aisyah Binte Rahman",
+      "donorNric": "S8123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    },
     {
       "timestamp": "2026-03-07T22:26:45.883Z",
       "source": "scheduled-cycle",
@@ -406,5 +757,5 @@
     }
   ],
   "lastSyncAt": "2026-03-07T22:30:12.714Z",
-  "updatedAt": "2026-03-07T22:30:12.714Z"
+  "updatedAt": "2026-03-08T05:07:43.071Z"
 }
