@@ -12,7 +12,9 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-DB_PATH = Path(__file__).with_name("skim_pintar.db")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+DATA_DIR = PROJECT_ROOT / "data"
+DB_PATH = DATA_DIR / "skim_pintar.db"
 DEFAULT_SEED_VERSION = "2026-03-08-v1"
 
 app = FastAPI(title="Skim Pintar API", version="1.0.0")
@@ -26,6 +28,7 @@ app.add_middleware(
 
 @contextmanager
 def get_conn():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     try:
@@ -970,7 +973,7 @@ def set_counter(payload: CounterPayload) -> dict[str, int]:
 
 def run_cli() -> int:
     parser = argparse.ArgumentParser(
-        description="Skim Pintar SQLite helpers (API is run with: uvicorn server:app --host 0.0.0.0 --port 8000)"
+        description="Skim Pintar SQLite helpers (API is run with: uvicorn backend.server:app --host 0.0.0.0 --port 8000)"
     )
     parser.add_argument(
         "--seed-defaults",
@@ -1009,7 +1012,7 @@ def run_cli() -> int:
         print("Database created and initialized.")
     else:
         print("Database initialized (existing file).")
-    print("Run API with: uvicorn server:app --host 0.0.0.0 --port 8000")
+    print("Run API with: uvicorn backend.server:app --host 0.0.0.0 --port 8000")
     return 0
 
 

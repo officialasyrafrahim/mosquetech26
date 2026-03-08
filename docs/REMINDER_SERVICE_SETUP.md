@@ -1,8 +1,10 @@
 # Reminder Service Setup (WhatsApp, SMS, Email)
 
+For first-time setup, use `docs/START_HERE.md` first.
+
 This project now includes a real reminder backend at:
 
-- `Claude/reminder-service.js`
+- `backend/reminder-service.js`
 
 It sends overdue payment reminders through:
 
@@ -13,8 +15,7 @@ It sends overdue payment reminders through:
 ## 1) Run the service
 
 ```bash
-cd /Users/adilhadizul/Desktop/Hackathon/MTC
-node Claude/reminder-service.js
+node backend/reminder-service.js
 ```
 
 Default port is `8787`.
@@ -29,12 +30,12 @@ export SP_REMINDER_PORT="8787"
 export SP_REMINDER_HOST="127.0.0.1"
 export SP_REMINDER_INTERVAL_MINUTES="30"
 export SP_REMINDER_OVERDUE_GRACE_DAYS="2"
-export SP_REMINDER_DATA_FILE="/tmp/skim-pintar-reminder-store.json"
+export SP_REMINDER_DATA_FILE="./data/reminder-store.json"
 ```
 
 You can also place variables in:
 
-- `Claude/.env.local` (auto-loaded by `reminder-service.js`)
+- `.env.local` in the project root (auto-loaded by `reminder-service.js`)
 - or a custom file via `SP_ENV_FILE=/path/to/file.env`
 
 Twilio (for WhatsApp + SMS):
@@ -68,7 +69,7 @@ export EMAIL_FROM="noreply@yourdomain.com"
 
 ## 3) Frontend sync config
 
-`Claude/skim-pintar4.html` now syncs donor records to:
+`frontend/skim-pintar4.html` now syncs donor records to:
 
 - `http://localhost:8787/api/sync/donors`
 - and sends real-time account events to:

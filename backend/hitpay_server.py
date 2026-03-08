@@ -16,9 +16,12 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qs, quote, urlparse
 from urllib.request import Request, urlopen
 
-BASE_DIR = Path(__file__).resolve().parent
-ENV_PATH = BASE_DIR / ".env"
-WEBHOOK_LOG_PATH = BASE_DIR / "hitpay_webhooks.ndjson"
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+WEB_DIR = PROJECT_ROOT / "frontend"
+DATA_DIR = PROJECT_ROOT / "data"
+ENV_PATH = PROJECT_ROOT / ".env.local"
+LEGACY_ENV_PATH = PROJECT_ROOT / ".env"
+WEBHOOK_LOG_PATH = DATA_DIR / "hitpay_webhooks.ndjson"
 WEBHOOK_FILE_LOCK = threading.Lock()
 REF_SANITIZER = re.compile(r"[^A-Za-z0-9._-]")
 LOOKUP_SANITIZER = re.compile(r"[^A-Za-z0-9_-]")
@@ -47,7 +50,10 @@ def load_env_file(path: Path) -> dict[str, str]:
     return values
 
 
-ENV_FILE_VALUES = load_env_file(ENV_PATH)
+ENV_FILE_VALUES = {
+    **load_env_file(LEGACY_ENV_PATH),
+    **load_env_file(ENV_PATH),
+}
 
 
 def env_value(name: str, default: str = "") -> str:
@@ -233,16 +239,21 @@ def append_webhook_event(payload: dict[str, Any]) -> None:
         "receivedAt": iso_now(),
         "payload": payload,
     }
+    WEBHOOK_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
     with WEBHOOK_FILE_LOCK:
         with WEBHOOK_LOG_PATH.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(event, ensure_ascii=True) + "\n")
+
+
+def default_user_file() -> str:
+    return "skim-pintar4.html" if (WEB_DIR / "skim-pintar4.html").exists() else "index.html"
 
 
 class HitPayHandler(SimpleHTTPRequestHandler):
     server_version = "HitPayHTTP/1.0"
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super().__init__(*args, directory=str(BASE_DIR), **kwargs)
+        super().__init__(*args, directory=str(WEB_DIR), **kwargs)
 
     def send_json(self, status_code: int, payload: dict[str, Any]) -> None:
         raw = json.dumps(payload, ensure_ascii=True).encode("utf-8")
@@ -282,16 +293,16 @@ class HitPayHandler(SimpleHTTPRequestHandler):
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         if parsed.path == "/":
-            default_file = "skim-pintar4.html" if (BASE_DIR / "skim-pintar4.html").exists() else "index.html"
+            default_file = default_user_file()
             self.path = f"/{default_file}"
             super().do_GET()
             return
         if parsed.path in {"/user", "/user/"}:
-            user_file = "skim-pintar4.html" if (BASE_DIR / "skim-pintar4.html").exists() else "index.html"
+            user_file = default_user_file()
             self.path = f"/{user_file}"
             super().do_GET()
             return
-        if parsed.path in {"/admin", "/admin/"} and (BASE_DIR / "skim-pintar4-admin.html").exists():
+        if parsed.path in {"/admin", "/admin/"} and (WEB_DIR / "skim-pintar4-admin.html").exists():
             self.path = "/skim-pintar4-admin.html"
             super().do_GET()
             return
@@ -431,8 +442,8 @@ class HitPayHandler(SimpleHTTPRequestHandler):
 
 
 def main() -> None:
-    default_file = "skim-pintar4.html" if (BASE_DIR / "skim-pintar4.html").exists() else "index.html"
-    print(f"Serving {default_file} from: {BASE_DIR}")
+    default_file = default_user_file()
+    print(f"Serving {default_file} from: {WEB_DIR}")
     print(f"Listening on: http://localhost:{PORT}")
     print(f"HitPay environment: {HITPAY_ENVIRONMENT}")
     if not HITPAY_API_KEY:

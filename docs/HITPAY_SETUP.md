@@ -1,11 +1,13 @@
 # HitPay Integration Setup
 
+For first-time setup, use `docs/START_HERE.md` first.
+
 ## What was added
-- `hitpay_server.py`
+- `backend/hitpay_server.py`
   - `POST /api/hitpay/create-payment`
   - `GET /api/hitpay/payment-status?payment_request_id=...`
   - `POST /api/hitpay/webhook` (HMAC verification using `HITPAY_SALT`)
-- `skim-pintar4.html`
+- `frontend/skim-pintar4.html`
   - New **HitPay Checkout** card in **My Payments**
   - Frontend checkout launch + return status handling
   - Step 3 Join wizard now supports `eGIRO` or `HitPay` setup
@@ -15,7 +17,7 @@
 
 ## Run locally
 ```bash
-PORT=3000 python3 hitpay_server.py
+PORT=3000 python3 backend/hitpay_server.py
 ```
 
 Then open:
@@ -37,13 +39,13 @@ Then open:
 
 ## Webhook logs
 - Verified webhook events are appended to:
-  - `hitpay_webhooks.ndjson`
+  - `data/hitpay_webhooks.ndjson`
 
 ## Admin dashboard
 - New admin panel file:
-  - `skim-pintar4-admin.html`
+  - `frontend/skim-pintar4-admin.html`
 - User portal file remains:
-  - `skim-pintar4.html`
+  - `frontend/skim-pintar4.html`
 - Admin dashboard reads from the same browser data keys used by the user portal.
 - If API `/bootstrap` is unavailable, admin auto-falls back to browser local storage.
 - Shortcut routes:

@@ -1,0 +1,21 @@
+# macOS metadata
+.DS_Store
+._*
+
+# Python cache/artifacts
+__pycache__/
+*.py[cod]
+
+# Node dependencies
+node_modules/
+
+# Local environment files
+.env
+.env.local
+
+# Temporary staging and cleanup area
+tmp/
+
+# Editor settings
+.idea/
+.vscode/

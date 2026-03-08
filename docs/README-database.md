@@ -1,6 +1,8 @@
 # Skim Pintar Server Database
 
-This project supports a server-side **SQLite** database (`skim_pintar.db`) for:
+For first-time setup, use `docs/START_HERE.md` first.
+
+This project supports a server-side **SQLite** database (`data/skim_pintar.db`) for:
 
 - user accounts
 - donor applications + relatives
@@ -8,35 +10,35 @@ This project supports a server-side **SQLite** database (`skim_pintar.db`) for:
 - auth/admin events
 - donor counter + sync pulse metadata
 
-## 1) Install and run database API (`server.py`)
+## 1) Install and run database API (`backend/server.py`)
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn server:app --host 0.0.0.0 --port 8000
+pip install -r backend/requirements.txt
+uvicorn backend.server:app --host 0.0.0.0 --port 8000
 ```
 
-When `server.py` starts, it auto-creates/migrates `skim_pintar.db` in the project root.
+When `backend/server.py` starts, it auto-creates/migrates `data/skim_pintar.db`.
 
 Default demo data is inserted automatically **only when the DB file is freshly created**.
 
 To insert default demo data manually later:
 
 ```bash
-python3 server.py --seed-defaults
+python3 backend/server.py --seed-defaults
 ```
 
 To force-replace existing data with defaults:
 
 ```bash
-python3 server.py --seed-defaults --force
+python3 backend/server.py --seed-defaults --force
 ```
 
-## 2) Run web app server (`hitpay_server.py`)
+## 2) Run web app server (`backend/hitpay_server.py`)
 
 ```bash
-PORT=3000 python3 hitpay_server.py
+PORT=3000 python3 backend/hitpay_server.py
 ```
 
 Open:
@@ -72,7 +74,7 @@ The admin page now persists cancellation and event updates back to the database 
 
 `notifyChannel` is now persisted for both users and donor submissions in SQLite and returned by `/api/bootstrap`, so notification preferences stay consistent between user and admin pages.
 
-## 6) Reminder service integration (`mtchadi/reminder-service.js`)
+## 6) Reminder service integration (`backend/reminder-service.js`)
 
 The user/admin pages now sync donor records to the reminder backend and send notification events.
 
@@ -80,7 +82,7 @@ Run reminder service:
 
 ```bash
 node -v   # ensure Node.js is installed
-node mtchadi/reminder-service.js
+node backend/reminder-service.js
 ```
 
 Optional browser runtime config (before app script loads):

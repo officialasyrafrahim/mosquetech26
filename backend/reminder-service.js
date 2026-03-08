@@ -32,13 +32,15 @@ function loadLocalEnv(filePath) {
   }
 }
 
-const LOCAL_ENV_FILE = process.env.SP_ENV_FILE || path.join(__dirname, '.env.local');
+const PROJECT_ROOT = path.resolve(__dirname, '..');
+const DEFAULT_DATA_FILE = path.join(PROJECT_ROOT, 'data', 'reminder-store.json');
+const LOCAL_ENV_FILE = process.env.SP_ENV_FILE || path.join(PROJECT_ROOT, '.env.local');
 loadLocalEnv(LOCAL_ENV_FILE);
 
 const PORT = Number(process.env.SP_REMINDER_PORT || 8787);
 const HOST = process.env.SP_REMINDER_HOST || '127.0.0.1';
 const API_KEY = process.env.SP_REMINDER_API_KEY || '';
-const DATA_FILE = process.env.SP_REMINDER_DATA_FILE || path.join('/tmp', 'skim-pintar-reminder-store.json');
+const DATA_FILE = process.env.SP_REMINDER_DATA_FILE || DEFAULT_DATA_FILE;
 const CHECK_INTERVAL_MINUTES = Number(process.env.SP_REMINDER_INTERVAL_MINUTES || 30);
 const OVERDUE_GRACE_DAYS = Number(process.env.SP_REMINDER_OVERDUE_GRACE_DAYS || 2);
 
