@@ -1,0 +1,410 @@
+{
+  "donors": [
+    {
+      "applicationId": "SP-2026-1250",
+      "submittedAt": "2026-03-07T17:50:03.532Z",
+      "updatedAt": null,
+      "terminatedAt": null,
+      "donor": {
+        "fullName": "Nur Aisyah Binte Rahman",
+        "nric": "S8123456A",
+        "mobile": "+65 9123 9876",
+        "email": "nur.aisyah@singpass.demo",
+        "address": "Blk 120 Bedok North Street 2, #07-219, Singapore 460120",
+        "contribution": 10,
+        "group": "Skim Pintar Group",
+        "notifyChannel": "whatsapp",
+        "egiroBank": "DBS/POSB",
+        "egiroAccount": "123-456789-0",
+        "egiroAccountHolder": "Adil",
+        "egiroDeductionDay": "1",
+        "egiroStartMonth": "2026-04",
+        "authUserId": "sp_1772869595252_z9hme4",
+        "authUserEmail": "nur.aisyah@singpass.demo"
+      },
+      "relatives": []
+    },
+    {
+      "applicationId": "SP-MOCK-2001",
+      "submittedAt": "2026-01-26T19:08:50.467Z",
+      "updatedAt": null,
+      "terminatedAt": null,
+      "donor": {
+        "fullName": "Ahmad Bin Yusof",
+        "nric": "S9123456A",
+        "mobile": "91234567",
+        "email": "basic.active@skim-pintar.test",
+        "address": "Blk 101 Bukit Batok West Ave 6, #08-112, Singapore 650101",
+        "contribution": 8,
+        "group": "Skim Pintar Group",
+        "notifyChannel": "whatsapp",
+        "egiroBank": "DBS/POSB",
+        "egiroAccount": "1234567890",
+        "egiroAccountHolder": "Ahmad Bin Yusof",
+        "egiroDeductionDay": "1",
+        "egiroStartMonth": "2025-07",
+        "authUserId": "usr_mock_basic_active",
+        "authUserEmail": "basic.active@skim-pintar.test"
+      },
+      "relatives": []
+    },
+    {
+      "applicationId": "SP-MOCK-2002",
+      "submittedAt": "2026-01-01T19:08:50.467Z",
+      "updatedAt": null,
+      "terminatedAt": null,
+      "donor": {
+        "fullName": "Nur Ain Bte Salleh",
+        "nric": "T0345678B",
+        "mobile": "92345678",
+        "email": "plus.active@skim-pintar.test",
+        "address": "Blk 210 Choa Chu Kang Ave 3, #05-88, Singapore 680210",
+        "contribution": 25,
+        "group": "Skim Pintar Plus Group",
+        "notifyChannel": "whatsapp",
+        "egiroBank": "OCBC",
+        "egiroAccount": "2345678901",
+        "egiroAccountHolder": "Nur Ain Bte Salleh",
+        "egiroDeductionDay": "5",
+        "egiroStartMonth": "2025-05",
+        "authUserId": "usr_mock_plus_active",
+        "authUserEmail": "plus.active@skim-pintar.test"
+      },
+      "relatives": [
+        {
+          "fullName": "Salleh Bin Rahman",
+          "dateOfBirth": "1985-02-15",
+          "relationship": "Husband",
+          "addressType": "same-address"
+        },
+        {
+          "fullName": "Aisha Bte Salleh",
+          "dateOfBirth": "2012-09-03",
+          "relationship": "Daughter",
+          "addressType": "same-address"
+        },
+        {
+          "fullName": "Ramlah Bte Osman",
+          "relationship": "Mother",
+          "address": "Blk 318 Woodlands Street 31, #02-54, Singapore 730318",
+          "addressType": "different-address"
+        }
+      ]
+    },
+    {
+      "applicationId": "SP-MOCK-2003",
+      "submittedAt": "2025-11-07T19:08:50.467Z",
+      "updatedAt": null,
+      "terminatedAt": "2026-02-23T19:08:50.467Z",
+      "donor": {
+        "fullName": "Hafiz Bin Karim",
+        "nric": "S7654321C",
+        "mobile": "93456789",
+        "email": "plus.ended@skim-pintar.test",
+        "address": "Blk 332 Jurong East St 31, #10-201, Singapore 600332",
+        "contribution": 30,
+        "group": "Skim Pintar Plus Group",
+        "notifyChannel": "whatsapp",
+        "egiroBank": "UOB",
+        "egiroAccount": "3456789012",
+        "egiroAccountHolder": "Hafiz Bin Karim",
+        "egiroDeductionDay": "10",
+        "egiroStartMonth": "2025-01",
+        "authUserId": "usr_mock_plus_ended",
+        "authUserEmail": "plus.ended@skim-pintar.test"
+      },
+      "relatives": [
+        {
+          "fullName": "Nurul Bte Hafiz",
+          "dateOfBirth": "2010-07-20",
+          "relationship": "Daughter",
+          "addressType": "same-address"
+        }
+      ]
+    },
+    {
+      "applicationId": "SP-MOCK-2004",
+      "submittedAt": "2026-03-04T19:08:50.467Z",
+      "updatedAt": null,
+      "terminatedAt": null,
+      "donor": {
+        "fullName": "Siti Mariam Bte Osman",
+        "nric": "T1122334D",
+        "mobile": "94567890",
+        "email": "processing.member@skim-pintar.test",
+        "address": "Blk 55 Tampines Street 11, #04-99, Singapore 521055",
+        "contribution": 6.5,
+        "group": "Skim Pintar Group",
+        "notifyChannel": "whatsapp",
+        "egiroBank": "Maybank",
+        "egiroAccount": "4567890123",
+        "egiroAccountHolder": "Siti Mariam Bte Osman",
+        "egiroDeductionDay": "1",
+        "egiroStartMonth": "2026-03",
+        "authUserId": "usr_mock_processing",
+        "authUserEmail": "processing.member@skim-pintar.test"
+      },
+      "relatives": []
+    },
+    {
+      "applicationId": "SP-2026-1251",
+      "submittedAt": "2026-03-07T20:32:21.354Z",
+      "updatedAt": "2026-03-07T20:32:39.287Z",
+      "terminatedAt": null,
+      "donor": {
+        "fullName": "Nur Aisyah Binte Rahman",
+        "nric": "S8123456A",
+        "mobile": "6591239876",
+        "email": "nur.aisyah@singpass.demo",
+        "address": "Blk 120 Bedok North Street 2, #07-219, Singapore 460120",
+        "contribution": 20,
+        "group": "Skim Pintar Plus Group",
+        "notifyChannel": "whatsapp",
+        "egiroBank": "DBS/POSB",
+        "egiroAccount": "1234567890",
+        "egiroAccountHolder": "Adil",
+        "egiroDeductionDay": "5",
+        "egiroStartMonth": "2026-05",
+        "authUserId": "",
+        "authUserEmail": ""
+      },
+      "relatives": [
+        {
+          "fullName": "Adil Hadi",
+          "dateOfBirth": "2025-06-10",
+          "relationship": "Wife",
+          "addressType": "same-address"
+        },
+        {
+          "fullName": "ADAM HILMI",
+          "relationship": "Mother-in-law",
+          "address": "688F Woodlands Drive 75",
+          "addressType": "different-address"
+        }
+      ]
+    },
+    {
+      "applicationId": "SP-2026-1252",
+      "submittedAt": "2026-03-07T21:04:06.791Z",
+      "updatedAt": "2026-03-07T21:58:31.135Z",
+      "terminatedAt": null,
+      "donor": {
+        "fullName": "Adil Hadi",
+        "nric": "T0315228B",
+        "mobile": "98632032",
+        "email": "adilhadizul@gmail.com",
+        "address": "BLK 688E WOODLANDS DRIVE 75",
+        "contribution": 100,
+        "group": "Skim Pintar Plus Group",
+        "notifyChannel": "email",
+        "egiroBank": "DBS/POSB",
+        "egiroAccount": "1234567890",
+        "egiroAccountHolder": "Adil",
+        "egiroDeductionDay": "5",
+        "egiroStartMonth": "2026-03",
+        "authUserId": "usr_1772896069926_jvlh33",
+        "authUserEmail": "adilhadizul@gmail.com"
+      },
+      "relatives": []
+    }
+  ],
+  "sentCycles": {},
+  "sentEvents": {
+    "SP-2026-1252:2026-03:payment_missed": {
+      "sentAt": "2026-03-07T22:26:45.532Z",
+      "eventType": "payment_missed",
+      "applicationId": "SP-2026-1252",
+      "channel": "email"
+    },
+    "SP-2026-1252:2026-03:payment_overdue": {
+      "sentAt": "2026-03-07T22:26:45.883Z",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-2026-1252",
+      "channel": "email"
+    }
+  },
+  "deliveryLog": [
+    {
+      "timestamp": "2026-03-07T22:26:45.883Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-2026-1252:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-2026-1252",
+      "donorName": "Adil Hadi",
+      "donorNric": "T0315228B",
+      "channelResult": {
+        "channel": "email",
+        "status": "sent",
+        "id": "47121d0e-93ad-4219-8a5a-241b3bed481a"
+      }
+    },
+    {
+      "timestamp": "2026-03-07T22:26:45.532Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-2026-1252:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-2026-1252",
+      "donorName": "Adil Hadi",
+      "donorNric": "T0315228B",
+      "channelResult": {
+        "channel": "email",
+        "status": "sent",
+        "id": "ab33c307-32c0-4770-b1ba-baff035c00ad"
+      }
+    },
+    {
+      "timestamp": "2026-03-07T22:26:45.028Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-2026-1251:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-2026-1251",
+      "donorName": "Nur Aisyah Binte Rahman",
+      "donorNric": "S8123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    },
+    {
+      "timestamp": "2026-03-07T22:26:45.028Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-2026-1251:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-2026-1251",
+      "donorName": "Nur Aisyah Binte Rahman",
+      "donorNric": "S8123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    },
+    {
+      "timestamp": "2026-03-07T22:26:45.028Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-MOCK-2004:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-MOCK-2004",
+      "donorName": "Siti Mariam Bte Osman",
+      "donorNric": "T1122334D",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    },
+    {
+      "timestamp": "2026-03-07T22:26:45.028Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-MOCK-2004:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-MOCK-2004",
+      "donorName": "Siti Mariam Bte Osman",
+      "donorNric": "T1122334D",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    },
+    {
+      "timestamp": "2026-03-07T22:26:45.028Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-MOCK-2002:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-MOCK-2002",
+      "donorName": "Nur Ain Bte Salleh",
+      "donorNric": "T0345678B",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    },
+    {
+      "timestamp": "2026-03-07T22:26:45.028Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-MOCK-2002:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-MOCK-2002",
+      "donorName": "Nur Ain Bte Salleh",
+      "donorNric": "T0345678B",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    },
+    {
+      "timestamp": "2026-03-07T22:26:45.028Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-MOCK-2001:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-MOCK-2001",
+      "donorName": "Ahmad Bin Yusof",
+      "donorNric": "S9123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    },
+    {
+      "timestamp": "2026-03-07T22:26:45.028Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-MOCK-2001:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-MOCK-2001",
+      "donorName": "Ahmad Bin Yusof",
+      "donorNric": "S9123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    },
+    {
+      "timestamp": "2026-03-07T22:26:45.028Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-2026-1250:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-2026-1250",
+      "donorName": "Nur Aisyah Binte Rahman",
+      "donorNric": "S8123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    },
+    {
+      "timestamp": "2026-03-07T22:26:45.028Z",
+      "source": "scheduled-cycle",
+      "manual": false,
+      "dedupeKey": "SP-2026-1250:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-2026-1250",
+      "donorName": "Nur Aisyah Binte Rahman",
+      "donorNric": "S8123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured"
+      }
+    }
+  ],
+  "lastSyncAt": "2026-03-07T22:30:12.714Z",
+  "updatedAt": "2026-03-07T22:30:12.714Z"
+}

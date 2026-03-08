@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0">
+<title>Skim Pintar Admin Dashboard — Masjid Ar-Raudhah</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --teal: #0B7A6E;
+  --teal-dark: #075A52;
+  --teal-light: #11A696;
+  --teal-pale: #E8F8F6;
+  --gold: #C8823A;
+  --gold-pale: #FFF8EC;
+  --cream: #F9F5EF;
+  --white: #FFFFFF;
+  --slate: #1E2D3D;
+  --body: #374151;
+  --muted: #6B7A8D;
+  --border: #DDD5C8;
+  --success: #065F46;
+  --success-pale: #ECFDF5;
+  --danger: #B91C1C;
+  --danger-pale: #FEF2F2;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.07);
+  --shadow-md: 0 6px 24px rgba(0,0,0,0.10);
+  --radius: 20px;
+  --radius-sm: 12px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  font-size: 18px;
+  background: var(--cream);
+  color: var(--body);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+.header {
+  background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal) 55%, var(--teal-light) 100%);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  box-shadow: 0 4px 20px rgba(7,90,82,0.35);
+}
+.header-logo { display: flex; align-items: center; gap: 14px; }
+.header-logo-icon {
+  width: 56px; height: 56px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+.header-title { color: white; }
+.header-title h1 { font-family: 'Amiri', serif; font-size: 22px; font-weight: 700; line-height: 1.2; }
+.header-title p { font-size: 13px; opacity: 0.8; margin-top: 2px; }
+.header-badge {
+  background: rgba(200,130,58,0.25);
+  border: 1.5px solid rgba(245,201,131,0.5);
+  color: #F5C983;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 5px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+.main { max-width: 980px; margin: 0 auto; padding: 24px 20px 72px; }
+
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 2px solid var(--border);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 16px;
+}
+
+.card-heading {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--slate);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-heading-icon {
+  width: 38px; height: 38px;
+  background: var(--teal-pale);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+.stat-box {
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--border);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+.stat-label { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); }
+.stat-num { font-size: 36px; font-weight: 900; color: var(--slate); margin: 6px 0 2px; }
+.stat-sub { font-size: 14px; color: var(--muted); }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 22px;
+  border-radius: var(--radius-sm);
+  font-family: 'Nunito', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+  border: none;
+  width: 100%;
+}
+.btn-gold {
+  background: var(--gold);
+  color: white;
+  box-shadow: 0 6px 20px rgba(200,130,58,0.3);
+}
+.btn-gold:hover { background: #a06828; }
+.btn-outline {
+  background: var(--white);
+  border: 2px solid var(--border);
+  color: var(--slate);
+}
+.btn-outline:hover {
+  border-color: var(--teal);
+  color: var(--teal-dark);
+}
+
+.admin-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 10px 0 16px;
+}
+
+.receipt {
+  background: var(--cream);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin: 14px 0 16px;
+}
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.receipt-row:last-child { border-bottom: none; }
+
+.list-item {
+  padding: 14px 16px;
+  background: var(--cream);
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  margin-bottom: 10px;
+}
+.list-item:last-child { margin-bottom: 0; }
+.list-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.list-title { font-weight: 900; color: var(--slate); }
+.list-sub { font-size: 14px; color: var(--muted); margin-top: 2px; }
+.badge {
+  background: var(--teal-pale);
+  color: var(--teal-dark);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.table-wrap { overflow-x: auto; }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+.table th {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.kicker {
+  margin-bottom: 14px;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.text-muted { color: var(--muted); }
+.text-sm { font-size: 14px; }
+.mt-3 { margin-top: 12px; }
+
+.form-label {
+  font-size: 14px;
+  color: var(--slate);
+  font-weight: 800;
+  margin-bottom: 6px;
+  display: block;
+}
+.form-control {
+  width: 100%;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-family: 'Nunito', sans-serif;
+  background: var(--white);
+  color: var(--body);
+}
+.form-control:focus {
+  outline: none;
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(11, 122, 110, 0.16);
+}
+.cancel-card {
+  border: 2px solid #f0c7c7;
+  background: #fff9f9;
+}
+.btn-danger {
+  background: #b91c1c;
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(185, 28, 28, 0.25);
+}
+.btn-danger:hover { background: #991b1b; }
+
+@media (max-width: 760px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .admin-actions { grid-template-columns: 1fr; }
+  .header { gap: 8px; }
+  .header-badge { font-size: 11px; padding: 4px 10px; }
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="header-logo">
+    <div class="header-logo-icon">🕌</div>
+    <div class="header-title">
+      <h1>Skim Pintar</h1>
+      <p>Admin Dashboard · Masjid Ar-Raudhah</p>
+    </div>
+  </div>
+  <span class="header-badge">Admin Only</span>
+</header>
+
+<main class="main">
+  <div class="kicker">Live sync from <code>skim-pintar4.html</code> registrations (same browser profile).</div>
+  <div id="admin-sync-source" class="text-sm text-muted">Loading data source...</div>
+  <div class="admin-actions">
+    <button class="btn btn-outline" type="button" onclick="refreshAdminDashboard()">🔄 Refresh Dashboard</button>
+    <button class="btn btn-outline" type="button" onclick="window.location.href='skim-pintar4.html'">👤 Open User Portal</button>
+  </div>
+
+  <section class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-label">Active Members</div>
+      <div class="stat-num" id="admin-active-members">0</div>
+      <div class="stat-sub" id="admin-active-members-sub">-</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Donor Registrations</div>
+      <div class="stat-num" id="admin-donor-registrations">0</div>
+      <div class="stat-sub" id="admin-donor-registrations-sub">-</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Current Month Contributions</div>
+      <div class="stat-num" id="admin-monthly-collections">$0.00</div>
+      <div class="stat-sub" id="admin-monthly-collections-sub">-</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-label">Auth Events (24h)</div>
+      <div class="stat-num" id="admin-auth-events-24h">0</div>
+      <div class="stat-sub" id="admin-auth-events-sub">-</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-heading"><div class="card-heading-icon">📊</div>Donor Register Export</div>
+    <p class="text-sm text-muted">Download donors, relatives, members, and auth activity into one Excel file.</p>
+    <div class="receipt">
+      <div class="receipt-row"><span>Total Donor Submissions</span><strong id="admin-export-donors">0</strong></div>
+      <div class="receipt-row"><span>Total Relatives</span><strong id="admin-export-relatives">0</strong></div>
+      <div class="receipt-row"><span>Total Members</span><strong id="admin-export-members">0</strong></div>
+      <div class="receipt-row"><span>Total Auth Events</span><strong id="admin-export-auth-events">0</strong></div>
+      <div class="receipt-row"><span>Last Synced</span><strong id="admin-export-last-sync">-</strong></div>
+    </div>
+    <button class="btn btn-gold" type="button" onclick="exportDonorExcel()">📥 Download Register Data (Excel)</button>
+  </section>
+
+  <section class="card">
+    <div class="card-heading"><div class="card-heading-icon">🆕</div>Latest Registrations</div>
+    <div id="admin-latest-registrations"></div>
+  </section>
+
+  <section class="card">
+    <div class="card-heading"><div class="card-heading-icon">⛔</div>Subscriber Cancellation</div>
+    <p class="text-sm text-muted">Cancel an active subscriber when requested. This stops future deductions in the user portal view.</p>
+    <div id="admin-active-subscribers"></div>
+  </section>
+
+  <section class="card cancel-card" id="admin-cancel-confirm-card" style="display:none">
+    <div class="card-heading"><div class="card-heading-icon">⚠️</div>Cancel Confirmation</div>
+    <div class="receipt">
+      <div class="receipt-row"><span>Status ID</span><strong id="admin-cancel-app-id">—</strong></div>
+      <div class="receipt-row"><span>Subscriber</span><strong id="admin-cancel-name">—</strong></div>
+      <div class="receipt-row"><span>Current Plan</span><strong id="admin-cancel-plan">—</strong></div>
+      <div class="receipt-row"><span>Payment Method</span><strong id="admin-cancel-method">—</strong></div>
+    </div>
+    <label class="form-label" for="admin-cancel-reason">Cancellation Reason</label>
+    <select id="admin-cancel-reason" class="form-control">
+      <option value="">Choose reason</option>
+      <option value="Requested by subscriber">Requested by subscriber</option>
+      <option value="Duplicate subscription">Duplicate subscription</option>
+      <option value="Administrative correction">Administrative correction</option>
+      <option value="Payment issue follow-up">Payment issue follow-up</option>
+      <option value="Other admin reason">Other admin reason</option>
+    </select>
+    <label class="form-label mt-3" for="admin-cancel-notes">Admin Notes (optional)</label>
+    <textarea id="admin-cancel-notes" class="form-control" rows="3" placeholder="Optional notes"></textarea>
+    <label class="text-sm" style="display:flex;gap:8px;align-items:flex-start;margin-top:12px">
+      <input id="admin-cancel-confirm-check" type="checkbox" style="margin-top:2px">
+      <span>I confirm this subscriber requested cancellation or this is an approved admin action.</span>
+    </label>
+    <div id="admin-cancel-message" class="text-sm text-muted mt-3"></div>
+    <div class="admin-actions">
+      <button class="btn btn-danger" type="button" onclick="confirmAdminCancellation()">✅ Confirm Cancellation</button>
+      <button class="btn btn-outline" type="button" onclick="closeAdminCancelConfirmation()">↩️ Back</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-heading"><div class="card-heading-icon">🔐</div>Recent Auth Events</div>
+    <div class="table-wrap">
+      <table class="table" id="admin-auth-table">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Event</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Method</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+const API_BASE_URL = window.SkimPintarApiBase || 'http://localhost:8000/api';
+const REMINDER_SYNC_URL = window.SP_REMINDER_SYNC_URL || 'http://localhost:8787/api/sync/donors';
+const REMINDER_SYNC_API_KEY = window.SP_REMINDER_SYNC_API_KEY || '';
+const NOTIFY_EVENT_URL = window.SP_NOTIFICATION_EVENT_URL || 'http://localhost:8787/api/notify/event';
+const NOTIFY_EVENT_API_KEY = window.SP_NOTIFICATION_EVENT_API_KEY || REMINDER_SYNC_API_KEY;
+const NOTIFY_CHANNELS = ['whatsapp', 'sms', 'email'];
+const DONOR_RECORDS_KEY = 'skimPintar4.donorRecords.v1';
+const MEMBER_DIRECTORY_KEY = 'skimPintar4.memberDirectory.v1';
+const AUTH_EVENTS_KEY = 'skimPintar4.authEvents.v1';
+const ADMIN_SYNC_PULSE_KEY = 'skimPintar4.syncPulse.v1';
+const ADMIN_SYNC_CHANNEL = 'skimPintar4-sync';
+const ADMIN_SYNC_KEYS = new Set([
+  DONOR_RECORDS_KEY,
+  MEMBER_DIRECTORY_KEY,
+  AUTH_EVENTS_KEY,
+  ADMIN_SYNC_PULSE_KEY
+]);
+
+let adminSyncChannel = null;
+if ('BroadcastChannel' in window) {
+  try {
+    adminSyncChannel = new BroadcastChannel(ADMIN_SYNC_CHANNEL);
+  } catch (_) {
+    adminSyncChannel = null;
+  }
+}
+
+function safeReadJson(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (_) {
+    return fallback;
+  }
+}
+
+function notifyAdminSync(sourceKey = '') {
+  const payload = {
+    source: 'skim-pintar4-admin',
+    sourceKey,
+    timestamp: new Date().toISOString()
+  };
+  try {
+    localStorage.setItem(ADMIN_SYNC_PULSE_KEY, JSON.stringify(payload));
+  } catch (_) {}
+  if (adminSyncChannel) {
+    try { adminSyncChannel.postMessage(payload); } catch (_) {}
+  }
+}
+
+function safeWriteJson(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    notifyAdminSync(key);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
+let adminState = {
+  donorRecords: [],
+  memberDirectory: [],
+  authEvents: [],
+  syncPulse: null,
+  source: 'local'
+};
+let pendingCancelApplicationId = '';
+
+async function apiRequest(path, options = {}) {
+  const resp = await fetch(`${API_BASE_URL}${path}`, {
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    ...options
+  });
+  if (!resp.ok) throw new Error(`API request failed (${resp.status})`);
+  return resp.status === 204 ? null : resp.json();
+}
+
+async function loadAdminState() {
+  try {
+    const data = await apiRequest('/bootstrap');
+    adminState.donorRecords = Array.isArray(data?.donorRecords) ? data.donorRecords : [];
+    adminState.memberDirectory = Array.isArray(data?.memberDirectory) ? data.memberDirectory : [];
+    adminState.authEvents = Array.isArray(data?.authEvents) ? data.authEvents : [];
+    adminState.syncPulse = data?.syncPulse || null;
+    adminState.source = 'api';
+    return;
+  } catch (_) {}
+
+  adminState.donorRecords = Array.isArray(safeReadJson(DONOR_RECORDS_KEY, [])) ? safeReadJson(DONOR_RECORDS_KEY, []) : [];
+  adminState.memberDirectory = Array.isArray(safeReadJson(MEMBER_DIRECTORY_KEY, [])) ? safeReadJson(MEMBER_DIRECTORY_KEY, []) : [];
+  adminState.authEvents = Array.isArray(safeReadJson(AUTH_EVENTS_KEY, [])) ? safeReadJson(AUTH_EVENTS_KEY, []) : [];
+  adminState.syncPulse = safeReadJson(ADMIN_SYNC_PULSE_KEY, null);
+  adminState.source = 'local';
+}
+
+function getDonorRecords() {
+  return Array.isArray(adminState.donorRecords) ? adminState.donorRecords : [];
+}
+
+function syncDonorRecordsToReminderService(records) {
+  if (!REMINDER_SYNC_URL) return;
+  const payload = { records: Array.isArray(records) ? records : [] };
+  const headers = { 'Content-Type': 'application/json' };
+  if (REMINDER_SYNC_API_KEY) headers['x-sp-api-key'] = REMINDER_SYNC_API_KEY;
+
+  try {
+    fetch(REMINDER_SYNC_URL, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
+    }).catch(() => {});
+  } catch (_) {
+    // ignore network failures in browser-only mode
+  }
+}
+
+function normalizeEmail(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function normalizeNric(value) {
+  return String(value || '')
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '');
+}
+
+function normalizePhone(value) {
+  return String(value || '').replace(/\D/g, '');
+}
+
+function normalizeNotifyChannel(value) {
+  const channel = String(value || '').trim().toLowerCase();
+  return NOTIFY_CHANNELS.includes(channel) ? channel : '';
+}
+
+function getNotificationDonorSnapshot(record = {}) {
+  const donor = record?.donor || {};
+  return {
+    applicationId: record?.applicationId || '',
+    fullName: donor.fullName || '',
+    nric: normalizeNric(donor.nric || donor.nricNormalized || ''),
+    mobile: normalizePhone(donor.mobile || ''),
+    email: normalizeEmail(donor.email || ''),
+    contribution: Number(donor.contribution || 0),
+    group: donor.group || '',
+    notifyChannel: normalizeNotifyChannel(donor.notifyChannel || '')
+  };
+}
+
+async function postNotificationEvent(eventType, options = {}) {
+  if (!NOTIFY_EVENT_URL || !eventType) {
+    return { ok: false, error: 'Notification service URL is not configured.' };
+  }
+  const headers = { 'Content-Type': 'application/json' };
+  if (NOTIFY_EVENT_API_KEY) headers['x-sp-api-key'] = NOTIFY_EVENT_API_KEY;
+
+  const payload = {
+    eventType,
+    timestamp: new Date().toISOString(),
+    donor: getNotificationDonorSnapshot(options?.record || {}),
+    details: options?.details || {},
+    dedupeKey: options?.dedupeKey || ''
+  };
+
+  try {
+    const response = await fetch(NOTIFY_EVENT_URL, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (_) {
+        data = {};
+      }
+      return {
+        ok: false,
+        status: response.status,
+        error: data?.error || `Notification API failed (${response.status}).`
+      };
+    }
+    return { ok: true, status: response.status };
+  } catch (error) {
+    return { ok: false, error: error?.message || 'Notification request failed.' };
+  }
+}
+
+async function saveDonorRecords(records) {
+  const safeRecords = Array.isArray(records) ? records : [];
+  const savedLocal = safeWriteJson(DONOR_RECORDS_KEY, safeRecords);
+  if (savedLocal) {
+    adminState.donorRecords = safeRecords;
+  }
+  if (adminState.source === 'api') {
+    await apiRequest('/donor-records', {
+      method: 'PUT',
+      body: JSON.stringify(safeRecords)
+    });
+    syncDonorRecordsToReminderService(safeRecords);
+    return;
+  }
+  if (!savedLocal) throw new Error('Unable to save donor records to local storage.');
+  syncDonorRecordsToReminderService(safeRecords);
+}
+
+function getMemberDirectory() {
+  return Array.isArray(adminState.memberDirectory) ? adminState.memberDirectory : [];
+}
+
+function getAuthEvents() {
+  return Array.isArray(adminState.authEvents) ? adminState.authEvents : [];
+}
+
+async function saveAuthEvents(events) {
+  const safeEvents = Array.isArray(events) ? events : [];
+  const savedLocal = safeWriteJson(AUTH_EVENTS_KEY, safeEvents);
+  if (savedLocal) {
+    adminState.authEvents = safeEvents;
+  }
+  if (adminState.source === 'api') {
+    await apiRequest('/auth-events', {
+      method: 'PUT',
+      body: JSON.stringify(safeEvents)
+    });
+    return;
+  }
+  if (!savedLocal) throw new Error('Unable to save auth events to local storage.');
+}
+
+function esc(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function isSchemeEnded(record) {
+  return Boolean(record && record.terminatedAt);
+}
+
+function setText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
+function formatNumber(value) {
+  return new Intl.NumberFormat('en-SG').format(Number.isFinite(value) ? value : 0);
+}
+
+function formatMoney(value) {
+  return `$${(Number.isFinite(value) ? value : 0).toFixed(2)}`;
+}
+
+function formatDateTime(value) {
+  if (!value) return '-';
+  const dt = new Date(value);
+  if (Number.isNaN(dt.getTime())) return '-';
+  return dt.toLocaleString('en-SG', {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+function getMonthStartTime() {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0).getTime();
+}
+
+function getPaymentMethodLabel(donor = {}) {
+  const code = String(donor.paymentMethod || '').toLowerCase();
+  if (code === 'hitpay') {
+    return String(donor.hitpayChargeMode || '').toLowerCase() === 'one_time'
+      ? 'HitPay (One-Time)'
+      : 'HitPay (Recurring)';
+  }
+  return 'eGIRO (Recurring)';
+}
+
+function recordsToSheets(records, members, authEvents) {
+  const donors = [];
+  const relatives = [];
+  const memberRows = [];
+  const authRows = [];
+
+  records.forEach((record, donorIndex) => {
+    donors.push({
+      'Application ID': record.applicationId || '',
+      'Submitted At': record.submittedAt || '',
+      'Donor Name': record.donor?.fullName || '',
+      'NRIC/FIN': record.donor?.nric || '',
+      'Mobile': record.donor?.mobile || '',
+      'Email': record.donor?.email || '',
+      'Address': record.donor?.address || '',
+      'Contribution (SGD)': record.donor?.contribution ?? '',
+      'Group': record.donor?.group || '',
+      'Notification Channel': record.donor?.notifyChannel || '',
+      'Payment Method': record.donor?.paymentMethod || 'egiro',
+      'HitPay Charge Mode': record.donor?.hitpayChargeMode || '',
+      'HitPay Billing Email': record.donor?.hitpayRecurringEmail || '',
+      'eGIRO Bank': record.donor?.egiroBank || '',
+      'eGIRO Account Number': record.donor?.egiroAccount || '',
+      'eGIRO Account Holder': record.donor?.egiroAccountHolder || '',
+      'eGIRO Deduction Day': record.donor?.egiroDeductionDay || '',
+      'eGIRO Start Month': record.donor?.egiroStartMonth || '',
+      'Terminated At': record.terminatedAt || '',
+      'Termination Reason': record.terminatedReason || record.terminationReason || '',
+      'Termination Notes': record.terminatedNotes || record.terminationNotes || '',
+      'Auth User Email': record.donor?.authUserEmail || '',
+      'Auth Provider': record.donor?.authProvider || '',
+      'Last Updated At': record.updatedAt || ''
+    });
+
+    (record.relatives || []).forEach((relative, relativeIndex) => {
+      relatives.push({
+        'Application ID': record.applicationId || '',
+        'Donor Name': record.donor?.fullName || '',
+        'Relative #': relativeIndex + 1,
+        'Full Name': relative.fullName || '',
+        'Relationship': relative.relationship || '',
+        'Date of Birth': relative.dateOfBirth || '',
+        'Address Type': relative.addressType || '',
+        'Address': relative.address || '',
+        'Record #': donorIndex + 1
+      });
+    });
+  });
+
+  if (relatives.length === 0) {
+    relatives.push({
+      'Application ID': '',
+      'Donor Name': '',
+      'Relative #': '',
+      'Full Name': '',
+      'Relationship': '',
+      'Date of Birth': '',
+      'Address Type': '',
+      'Address': '',
+      'Record #': ''
+    });
+  }
+
+  (members || []).forEach(member => {
+    memberRows.push({
+      'Member Record ID': member.memberRecordId || '',
+      'User ID': member.userId || '',
+      'Full Name': member.fullName || '',
+      'Mobile': member.mobile || '',
+      'Email': member.email || '',
+      'Provider': member.provider || '',
+      'NRIC/FIN': member.nric || '',
+      'First Registered At': member.firstRegisteredAt || '',
+      'Last Seen At': member.lastSeenAt || '',
+      'Last Auth Action': member.lastAuthAction || ''
+    });
+  });
+
+  (authEvents || []).forEach(evt => {
+    authRows.push({
+      'Timestamp': evt.timestamp || '',
+      'Event Type': evt.eventType || '',
+      'Method': evt.method || '',
+      'User ID': evt.userId || '',
+      'Full Name': evt.fullName || '',
+      'Email': evt.email || '',
+      'Provider': evt.provider || '',
+      'Event ID': evt.eventId || ''
+    });
+  });
+
+  if (memberRows.length === 0) {
+    memberRows.push({
+      'Member Record ID': '',
+      'User ID': '',
+      'Full Name': '',
+      'Mobile': '',
+      'Email': '',
+      'Provider': '',
+      'NRIC/FIN': '',
+      'First Registered At': '',
+      'Last Seen At': '',
+      'Last Auth Action': ''
+    });
+  }
+
+  if (authRows.length === 0) {
+    authRows.push({
+      'Timestamp': '',
+      'Event Type': '',
+      'Method': '',
+      'User ID': '',
+      'Full Name': '',
+      'Email': '',
+      'Provider': '',
+      'Event ID': ''
+    });
+  }
+
+  return { donors, relatives, memberRows, authRows };
+}
+
+function csvEscape(value) {
+  const text = String(value ?? '');
+  return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+function downloadTextFile(filename, content, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function exportDonorExcel() {
+  const records = getDonorRecords();
+  const members = getMemberDirectory();
+  const authEvents = getAuthEvents();
+
+  if (records.length === 0 && members.length === 0 && authEvents.length === 0) {
+    alert('No records yet. Submit registrations on skim-pintar4.html first.');
+    return;
+  }
+
+  const { donors, relatives, memberRows, authRows } = recordsToSheets(records, members, authEvents);
+  const datestamp = new Date().toISOString().slice(0, 10);
+
+  if (typeof XLSX !== 'undefined') {
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(donors), 'Donors');
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(relatives), 'Relatives');
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(memberRows), 'Members');
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(authRows), 'Auth Events');
+    XLSX.writeFile(wb, `skim-pintar-register-${datestamp}.xlsx`);
+    return;
+  }
+
+  const fallbackRows = records.length > 0 ? donors : (members.length > 0 ? memberRows : authRows);
+  const headers = Object.keys(fallbackRows[0]);
+  const csv = [
+    headers.map(csvEscape).join(','),
+    ...fallbackRows.map(row => headers.map(h => csvEscape(row[h])).join(','))
+  ].join('\n');
+  downloadTextFile(`skim-pintar-register-${datestamp}.csv`, csv, 'text/csv;charset=utf-8;');
+  alert('Excel library unavailable. CSV fallback downloaded.');
+}
+
+function renderLatestRegistrations(records) {
+  const wrap = document.getElementById('admin-latest-registrations');
+  if (!wrap) return;
+
+  if (!records.length) {
+    wrap.innerHTML = '<div class="text-sm text-muted">No donor registrations yet.</div>';
+    return;
+  }
+
+  const latest = [...records]
+    .sort((a, b) => new Date(b.submittedAt || 0) - new Date(a.submittedAt || 0))
+    .slice(0, 8);
+
+  wrap.innerHTML = latest.map(record => {
+    const amount = Number(record?.donor?.contribution);
+    const contribution = Number.isFinite(amount) ? formatMoney(amount) : '-';
+    const title = record?.donor?.fullName || 'Unnamed donor';
+    const appId = record?.applicationId || '-';
+    const relCount = Array.isArray(record?.relatives) ? record.relatives.length : 0;
+    const paymentMethod = getPaymentMethodLabel(record?.donor || {});
+    const time = formatDateTime(record?.submittedAt);
+    const ended = isSchemeEnded(record);
+    return `
+      <div class="list-item">
+        <div class="list-top">
+          <div class="list-title">${title}</div>
+          <span class="badge">${contribution}</span>
+        </div>
+        <div class="list-sub">${appId} · ${record?.donor?.group || 'Skim Pintar Basic'} · ${ended ? 'Ended' : 'Active'}</div>
+        <div class="list-sub">Payment: ${paymentMethod}</div>
+        <div class="list-sub">${relCount} relatives · ${time}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderActiveSubscribers(records) {
+  const wrap = document.getElementById('admin-active-subscribers');
+  if (!wrap) return;
+
+  const active = [...records]
+    .filter(record => !isSchemeEnded(record))
+    .sort((a, b) => new Date(b.submittedAt || 0) - new Date(a.submittedAt || 0));
+
+  if (!active.length) {
+    wrap.innerHTML = '<div class="text-sm text-muted">No active subscribers to cancel.</div>';
+    return;
+  }
+
+  wrap.innerHTML = active.map(record => {
+    const donor = record?.donor || {};
+    const amount = Number(donor.contribution);
+    const contribution = Number.isFinite(amount) ? formatMoney(amount) : '-';
+    const appId = record.applicationId || '-';
+    return `
+      <div class="list-item">
+        <div class="list-top">
+          <div class="list-title">${esc(donor.fullName || 'Unnamed donor')}</div>
+          <span class="badge">${esc(contribution)}</span>
+        </div>
+        <div class="list-sub">${esc(appId)} · ${esc(donor.group || 'Skim Pintar Basic')}</div>
+        <div class="list-sub">Payment: ${esc(getPaymentMethodLabel(donor))}</div>
+        <div class="admin-actions" style="margin-top:10px">
+          <button class="btn btn-danger" type="button" onclick="openAdminCancelConfirmation('${esc(appId)}')">⛔ Cancel Subscriber</button>
+          <button class="btn btn-outline" type="button" onclick="window.location.href='skim-pintar4.html'">🔎 View User Portal</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openAdminCancelConfirmation(applicationId) {
+  const appId = String(applicationId || '').trim();
+  const records = getDonorRecords();
+  const record = records.find(item => item?.applicationId === appId);
+  if (!record) {
+    alert('Subscriber record not found.');
+    return;
+  }
+  if (isSchemeEnded(record)) {
+    alert('This subscriber is already cancelled.');
+    return;
+  }
+
+  pendingCancelApplicationId = appId;
+  const donor = record.donor || {};
+  setText('admin-cancel-app-id', appId);
+  setText('admin-cancel-name', donor.fullName || '-');
+  setText('admin-cancel-plan', donor.group || 'Skim Pintar Basic');
+  setText('admin-cancel-method', getPaymentMethodLabel(donor));
+
+  const reasonEl = document.getElementById('admin-cancel-reason');
+  const notesEl = document.getElementById('admin-cancel-notes');
+  const confirmEl = document.getElementById('admin-cancel-confirm-check');
+  const msgEl = document.getElementById('admin-cancel-message');
+  if (reasonEl) reasonEl.value = '';
+  if (notesEl) notesEl.value = '';
+  if (confirmEl) confirmEl.checked = false;
+  if (msgEl) msgEl.textContent = '';
+
+  const card = document.getElementById('admin-cancel-confirm-card');
+  if (card) {
+    card.style.display = 'block';
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+function closeAdminCancelConfirmation() {
+  pendingCancelApplicationId = '';
+  const card = document.getElementById('admin-cancel-confirm-card');
+  if (card) card.style.display = 'none';
+}
+
+async function confirmAdminCancellation() {
+  const appId = String(pendingCancelApplicationId || '').trim();
+  if (!appId) {
+    alert('Please choose a subscriber to cancel first.');
+    return;
+  }
+
+  const reasonEl = document.getElementById('admin-cancel-reason');
+  const notesEl = document.getElementById('admin-cancel-notes');
+  const confirmEl = document.getElementById('admin-cancel-confirm-check');
+  const msgEl = document.getElementById('admin-cancel-message');
+  const reason = String(reasonEl?.value || '').trim();
+  const notes = String(notesEl?.value || '').trim();
+  const confirmed = Boolean(confirmEl?.checked);
+
+  if (!reason) {
+    alert('Please select a cancellation reason.');
+    return;
+  }
+  if (!confirmed) {
+    alert('Please confirm the cancellation declaration first.');
+    return;
+  }
+  if (!window.confirm(`Confirm cancellation for ${appId}? This will mark the subscription as ended.`)) {
+    return;
+  }
+
+  const records = getDonorRecords();
+  let updated = null;
+  records.forEach(item => {
+    if (item?.applicationId !== appId) return;
+    item.terminatedAt = new Date().toISOString();
+    item.terminatedReason = reason;
+    item.terminatedNotes = notes;
+    item.terminatedByAdmin = true;
+    item.updatedAt = new Date().toISOString();
+    updated = item;
+  });
+
+  if (!updated) {
+    if (msgEl) msgEl.textContent = 'Unable to cancel: record not found.';
+    return;
+  }
+
+  try {
+    await saveDonorRecords(records);
+    const events = getAuthEvents();
+    events.push({
+      eventId: `evt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      eventType: 'admin_scheme_cancelled',
+      method: 'admin-dashboard',
+      timestamp: updated.terminatedAt,
+      userId: '',
+      fullName: updated?.donor?.fullName || '',
+      email: updated?.donor?.email || '',
+      provider: 'admin',
+      applicationId: appId,
+      reason
+    });
+    if (events.length > 5000) events.splice(0, events.length - 5000);
+    await saveAuthEvents(events);
+    const dedupeDate = String(updated.terminatedAt || '').slice(0, 10) || new Date().toISOString().slice(0, 10);
+    const notificationResult = await postNotificationEvent('donation_stopped', {
+      record: updated,
+      dedupeKey: `${appId}:${dedupeDate}:donation_stopped`,
+      details: { reason, notes, cancelledBy: 'admin' }
+    });
+    if (msgEl) {
+      const baseMessage = `Subscriber ${appId} cancelled at ${new Date(updated.terminatedAt).toLocaleString('en-SG')}.`;
+      msgEl.textContent = notificationResult.ok
+        ? baseMessage
+        : `${baseMessage} Reminder event failed to send (${notificationResult.error || 'unknown error'}).`;
+    }
+    refreshAdminDashboard();
+  } catch (error) {
+    if (msgEl) msgEl.textContent = `Cancellation failed: ${error?.message || 'Unable to save to database.'}`;
+  }
+}
+
+function renderAuthEvents(authEvents) {
+  const tbody = document.querySelector('#admin-auth-table tbody');
+  if (!tbody) return;
+
+  const latest = [...authEvents]
+    .sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0))
+    .slice(0, 10);
+
+  if (!latest.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="text-muted">No auth events yet.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = latest.map(evt => `
+    <tr>
+      <td>${formatDateTime(evt.timestamp)}</td>
+      <td>${evt.eventType || '-'}</td>
+      <td>${evt.fullName || '-'}</td>
+      <td>${evt.email || '-'}</td>
+      <td>${evt.method || '-'}</td>
+    </tr>
+  `).join('');
+}
+
+function getLastUpdatedTimestamp(records, members, authEvents) {
+  const values = [];
+  records.forEach(r => values.push(r?.submittedAt));
+  members.forEach(m => {
+    values.push(m?.firstRegisteredAt);
+    values.push(m?.lastSeenAt);
+  });
+  authEvents.forEach(e => values.push(e?.timestamp));
+  const pulse = adminState.syncPulse || safeReadJson(ADMIN_SYNC_PULSE_KEY, null);
+  if (pulse?.timestamp) values.push(pulse.timestamp);
+
+  let latest = 0;
+  values.forEach(value => {
+    const t = value ? new Date(value).getTime() : NaN;
+    if (Number.isFinite(t) && t > latest) latest = t;
+  });
+  return latest ? new Date(latest).toISOString() : '';
+}
+
+async function refreshAdminDashboard() {
+  await loadAdminState();
+  const records = getDonorRecords();
+  const members = getMemberDirectory();
+  const authEvents = getAuthEvents();
+
+  const monthStart = getMonthStartTime();
+  const now = Date.now();
+  const authSince = now - (24 * 60 * 60 * 1000);
+
+  const monthlyContributionTotal = records.reduce((sum, record) => {
+    const submitted = new Date(record?.submittedAt || 0).getTime();
+    const amount = Number(record?.donor?.contribution);
+    if (!Number.isFinite(submitted) || submitted < monthStart || !Number.isFinite(amount)) return sum;
+    return sum + amount;
+  }, 0);
+
+  const membersThisMonth = members.reduce((sum, member) => {
+    const created = new Date(member?.firstRegisteredAt || 0).getTime();
+    if (!Number.isFinite(created) || created < monthStart) return sum;
+    return sum + 1;
+  }, 0);
+
+  const authEvents24h = authEvents.reduce((sum, evt) => {
+    const ts = new Date(evt?.timestamp || 0).getTime();
+    if (!Number.isFinite(ts) || ts < authSince) return sum;
+    return sum + 1;
+  }, 0);
+
+  const totalRelatives = records.reduce((sum, record) => {
+    const relatives = Array.isArray(record?.relatives) ? record.relatives.length : 0;
+    return sum + relatives;
+  }, 0);
+
+  const lastSynced = getLastUpdatedTimestamp(records, members, authEvents);
+  const syncSourceEl = document.getElementById('admin-sync-source');
+  if (syncSourceEl) {
+    syncSourceEl.textContent = adminState.source === 'api'
+      ? `Data source: API (${API_BASE_URL}/bootstrap)`
+      : 'Data source: browser local storage (open this page in the same browser profile as user portal).';
+  }
+
+  setText('admin-active-members', formatNumber(members.length));
+  setText('admin-active-members-sub', `${formatNumber(membersThisMonth)} new this month`);
+  setText('admin-donor-registrations', formatNumber(records.length));
+  setText('admin-donor-registrations-sub', `${formatNumber(totalRelatives)} relatives linked`);
+  setText('admin-monthly-collections', formatMoney(monthlyContributionTotal));
+  setText('admin-monthly-collections-sub', `Since ${new Date(monthStart).toLocaleDateString('en-SG')}`);
+  setText('admin-auth-events-24h', formatNumber(authEvents24h));
+  setText('admin-auth-events-sub', `${formatNumber(authEvents.length)} total auth events`);
+
+  setText('admin-export-donors', formatNumber(records.length));
+  setText('admin-export-relatives', formatNumber(totalRelatives));
+  setText('admin-export-members', formatNumber(members.length));
+  setText('admin-export-auth-events', formatNumber(authEvents.length));
+  setText('admin-export-last-sync', lastSynced ? formatDateTime(lastSynced) : '-');
+
+  renderLatestRegistrations(records);
+  renderActiveSubscribers(records);
+  renderAuthEvents(authEvents);
+}
+
+function initAdminLiveSync() {
+  refreshAdminDashboard();
+
+  window.addEventListener('storage', event => {
+    if (!event.key || ADMIN_SYNC_KEYS.has(event.key)) refreshAdminDashboard();
+  });
+
+  if (adminSyncChannel) {
+    adminSyncChannel.onmessage = () => refreshAdminDashboard();
+  }
+
+  setInterval(refreshAdminDashboard, 5000);
+}
+
+initAdminLiveSync();
+</script>
+</body>
+</html>

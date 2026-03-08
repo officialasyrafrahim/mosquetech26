@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Services | Skim Pintar</title>
+  <style>
+    :root {
+      --bg-page: #f2f2f2;
+      --bg-head: #efefef;
+      --bg-strip: #e6dfda;
+      --text-main: #333333;
+      --text-muted: #6c6c6c;
+      --accent: #b07d6f;
+      --line: #d5cdc8;
+      --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Avenir Next", "Segoe UI", Arial, sans-serif;
+      color: var(--text-main);
+      background: var(--bg-page);
+      line-height: 1.65;
+    }
+
+    a { color: inherit; }
+
+    .top-nav {
+      background: var(--bg-head);
+      border-bottom: 1px solid #e3e3e3;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .top-nav-inner {
+      max-width: 1880px;
+      margin: 0 auto;
+      padding: 14px 42px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: nowrap;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 420px;
+      flex: 0 0 auto;
+    }
+
+    .brand-logo {
+      width: 50px;
+      height: 65px;
+      object-fit: contain;
+      display: block;
+      flex: 0 0 auto;
+    }
+
+    .brand-text {
+      text-transform: uppercase;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: 0.5px;
+      color: #303030;
+      font-size: 13px;
+    }
+
+    .brand-tag {
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+
+    .brand-social {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .social-chip {
+      width: 21px;
+      height: 21px;
+      border-radius: 3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      color: #fff;
+      font-weight: 700;
+      line-height: 1;
+      flex: 0 0 auto;
+    }
+
+    .social-chip.fb {
+      background: #365899;
+    }
+
+    .social-chip.ig {
+      background: linear-gradient(145deg, #7e3cb8, #fd7b32);
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      font-weight: 700;
+      margin-left: 3px;
+    }
+
+    .main-links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 36px;
+      flex: 1 1 auto;
+      color: #4f4f4f;
+      white-space: nowrap;
+    }
+
+    .main-links a {
+      text-decoration: none;
+      font-size: 17px;
+      font-weight: 500;
+      letter-spacing: 0.1px;
+      line-height: 1.2;
+    }
+
+    .main-links a.active {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex: 0 0 auto;
+    }
+
+    .btn-contact {
+      border: none;
+      border-radius: 6px;
+      background: var(--accent);
+      color: var(--white);
+      font-size: 17px;
+      font-weight: 500;
+      padding: 11px 28px;
+      text-decoration: none;
+      line-height: 1.2;
+    }
+
+    .search-icon {
+      width: 23px;
+      height: 23px;
+      border: 3px solid #666;
+      border-radius: 50%;
+      position: relative;
+      display: inline-block;
+      margin-right: 4px;
+    }
+
+    .search-icon::after {
+      content: "";
+      width: 10px;
+      height: 3px;
+      background: #666;
+      position: absolute;
+      right: -8px;
+      bottom: -1px;
+      transform: rotate(45deg);
+      border-radius: 2px;
+    }
+
+    .header-spacer {
+      height: 42px;
+      background: #f5f5f5;
+      border-top: 1px solid #ececec;
+      border-bottom: 1px solid #ece4df;
+    }
+
+    .services-strip {
+      background: var(--bg-strip);
+      border-top: 1px solid #ece4df;
+      border-bottom: 1px solid #d9d1cc;
+    }
+
+    .services-strip-inner {
+      max-width: 1720px;
+      margin: 0 auto;
+      padding: 58px 24px 46px;
+    }
+
+    .services-tabs {
+      list-style: none;
+      margin: 0;
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 38px;
+      border-bottom: 2px solid var(--line);
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+    }
+
+    .services-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .services-tabs li {
+      padding: 0 12px 26px;
+      font-size: 22px;
+      font-weight: 500;
+      color: #303030;
+      border-bottom: 6px solid transparent;
+      flex: 0 0 auto;
+    }
+
+    .services-tabs li.active {
+      border-bottom-color: var(--accent);
+    }
+
+    .content {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 40px 20px 56px;
+      background: #f7f7f7;
+    }
+
+    .content-panel {
+      background: var(--white);
+      border: 1px solid #e6e6e6;
+      border-radius: 12px;
+      padding: 30px 28px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 38px;
+      color: #2b2b2b;
+    }
+
+    h2 {
+      margin: 28px 0 10px;
+      font-size: 27px;
+      color: #2b2b2b;
+    }
+
+    p {
+      margin: 0 0 14px;
+      font-size: 20px;
+    }
+
+    ul {
+      margin: 0 0 12px 24px;
+      padding: 0;
+      font-size: 20px;
+    }
+
+    li { margin-bottom: 6px; }
+
+    .note-title {
+      margin-top: 10px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .quote {
+      margin-top: 22px;
+      padding: 18px 20px;
+      border-left: 5px solid var(--accent);
+      background: #fcf7f5;
+      font-size: 21px;
+      font-style: italic;
+    }
+
+    .quote-ref {
+      margin-top: 8px;
+      font-size: 18px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .cta {
+      margin-top: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      background: var(--accent);
+      color: var(--white);
+      border-radius: 8px;
+      padding: 12px 18px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .site-footer {
+      margin-top: 20px;
+      background: #dcdcdc;
+      border-top: 1px solid #d0d0d0;
+    }
+
+    .site-footer-inner {
+      max-width: 1700px;
+      margin: 0 auto;
+      padding: 58px 40px 34px;
+      display: grid;
+      grid-template-columns: 240px 1fr 1fr 1fr;
+      gap: 36px;
+      align-items: start;
+    }
+
+    .footer-logo {
+      width: 130px;
+      height: 180px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .foot-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #8a8a8a;
+      letter-spacing: 0.8px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .foot-text {
+      font-size: 17px;
+      line-height: 1.45;
+    }
+
+    .foot-text strong { font-weight: 800; }
+
+    .foot-link {
+      margin-top: 16px;
+      display: inline-block;
+      text-decoration: none;
+      border-top: 2px solid #8c8c8c;
+      padding-top: 10px;
+      font-size: 17px;
+      color: #333;
+    }
+
+    .site-footer-bottom {
+      max-width: 1700px;
+      margin: 0 auto;
+      padding: 12px 40px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: #777;
+      font-size: 32px;
+    }
+
+    .copyright {
+      font-size: 16px;
+      color: #777;
+    }
+
+    @media (max-width: 1600px) {
+      .main-links {
+        gap: 26px;
+      }
+      .main-links a {
+        font-size: 17px;
+      }
+      .btn-contact {
+        font-size: 17px;
+      }
+      .services-tabs {
+        gap: 28px;
+      }
+      .services-tabs li {
+        font-size: 18px;
+      }
+    }
+
+    @media (max-width: 1200px) {
+      .top-nav-inner {
+        padding: 12px 20px;
+        flex-wrap: wrap;
+      }
+      .brand-group {
+        min-width: 0;
+      }
+      .main-links {
+        order: 3;
+        width: 100%;
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 2px;
+      }
+      .services-strip-inner {
+        padding-top: 40px;
+      }
+      .services-tabs li {
+        font-size: 16px;
+      }
+      .foot-text {
+        font-size: 16px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .header-spacer {
+        height: 20px;
+      }
+      .brand-tag {
+        font-size: 10px;
+      }
+      .brand-sub {
+        font-size: 10px;
+      }
+      .main-links {
+        gap: 20px;
+      }
+      .main-links a,
+      .btn-contact {
+        font-size: 15px;
+      }
+      .services-strip-inner {
+        padding: 28px 12px 28px;
+      }
+      .services-tabs li {
+        font-size: 15px;
+        padding-bottom: 16px;
+        border-bottom-width: 4px;
+      }
+      .site-footer-inner {
+        grid-template-columns: 1fr;
+        text-align: left;
+      }
+      .footer-logo {
+        margin: 0;
+      }
+      p,
+      ul,
+      .note-title {
+        font-size: 18px;
+      }
+      h1 {
+        font-size: 34px;
+      }
+      h2 {
+        font-size: 24px;
+      }
+      .site-footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="top-nav">
+    <div class="top-nav-inner">
+      <div class="brand-group">
+        <img class="brand-logo" src="../assets/arraudhah-logo.svg" alt="Masjid Ar-Raudhah logo">
+        <div class="brand-text">
+          <div class="brand-tag">#THEARRAUDHAHEXPERIENCE</div>
+          <div class="brand-social">
+            <span class="social-chip fb" aria-hidden="true">f</span>
+            <span class="social-chip ig" aria-hidden="true">◉</span>
+            <span class="brand-sub">@MASJIDARRAUDHAH</span>
+          </div>
+        </div>
+      </div>
+
+      <nav class="main-links" aria-label="Main">
+        <a href="#">About</a>
+        <a href="#" class="active">Services</a>
+        <a href="#">Raudhatul Quran</a>
+        <a href="#">Courses</a>
+        <a href="#">Community</a>
+        <a href="#">Contribute</a>
+        <a href="#">Ramadan 1447H</a>
+      </nav>
+
+      <div class="top-actions">
+        <a class="btn-contact" href="#">Contact</a>
+        <span class="search-icon" aria-hidden="true"></span>
+      </div>
+    </div>
+  </header>
+
+  <div class="header-spacer" aria-hidden="true"></div>
+
+  <section class="services-strip">
+    <div class="services-strip-inner">
+      <ul class="services-tabs" aria-label="Services tabs">
+        <li>Facilities Rental</li>
+        <li>Tahnik &amp; Tahliq</li>
+        <li class="active">Skim Pintar</li>
+        <li>Zakat</li>
+        <li>Funeral Service</li>
+        <li>Korban</li>
+        <li>Nikah/Solemnisation</li>
+      </ul>
+    </div>
+  </section>
+
+  <main class="content">
+    <article class="content-panel">
+      <h1>Skim Pintar</h1>
+
+      <h2>What is Skim Pintar?</h2>
+      <p>It is a scheme to facilitate our jemaah to make monthly donation to the mosque through GIRO. Donors who donate $5.00/month (Pintar) will get free funeral services for himself in the event of his death while donors who donate more than $20.00/month (Pintar Plus) will get complimentary funeral services for the immediate family living under one address in the event of any death in the family.</p>
+
+      <h2>How do I register?</h2>
+      <p>Donors with a bank account will have to fill in the Giro form.</p>
+
+      <h2>What are the benefits of Skim Pintar?</h2>
+      <ul>
+        <li>Concession or complimentary funeral service for donors</li>
+        <li>Concession or complimentary funeral service for donors and family of Pintar Plus in the same household (Spouse, Children, Parents, Siblings)</li>
+        <li>50% coverage for funeral services for parents / parents-in-law not living in the same household</li>
+        <li>20% off courses organised by Ar-Raudhah Mosque</li>
+      </ul>
+
+      <p class="note-title">*Complimentary Funeral Service consist of:</p>
+      <ul>
+        <li>Bathing, shrouding, prayer, burial</li>
+        <li>Undertaker (Jurumandi)</li>
+        <li>Bathing and shrouding kits (Soap, camphor, perfume, kain kafan)</li>
+        <li>Nisan, name plate, carpet grass</li>
+        <li>40 seater bus to cemetery (2 way)</li>
+      </ul>
+
+      <p class="note-title">*Additional fees:</p>
+      <ul>
+        <li>Transport from Hospice, Hospital etc.</li>
+        <li>Transport to Mosque (Bathing / Prayer)</li>
+        <li>NEA burial plot</li>
+        <li>24hr doctor’s fee for death verification</li>
+      </ul>
+
+      <h2>How can the donation be channeled to the mosque?</h2>
+      <p>Our bank will channel your monthly donations to the mosque’s bank account, after your application have been approved.</p>
+
+      <a class="cta" href="skim-pintar4.html">Proceed to Skim Pintar (skim-pintar4.html)</a>
+
+      <div class="quote">“Aisyah (RA) narrated that the Prophet (PBUH) was asked, "What deeds are loved most by Allah?" He said, "The most regular constant deeds even though they may be few."”</div>
+      <p class="quote-ref">Narrated by Bukhari, no. 6465</p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <div>
+        <img class="footer-logo" src="../assets/arraudhah-logo.svg" alt="Masjid Ar-Raudhah logo">
+      </div>
+
+      <div>
+        <div class="foot-title">Address</div>
+        <div class="foot-text"><strong>Masjid Ar-Raudhah</strong><br>30, Bukit Batok East Ave 2<br>Singapore 659919</div>
+      </div>
+
+      <div>
+        <div class="foot-title">Reach Us At</div>
+        <div class="foot-text">☎ 6899 5840<br>📞 6564 1924<br>✉ Email us<br><br>f &nbsp; ◎</div>
+      </div>
+
+      <div>
+        <div class="foot-title">Contribute</div>
+        <div class="foot-text">Bank Transfer:<br>OCBC Current 501-806368-001<br>PayNow: UEN S93MQ0024E</div>
+        <a class="foot-link" href="#">More ways to contribute</a>
+      </div>
+    </div>
+
+    <div class="site-footer-bottom">
+      <div class="copyright">© 2026 Masjid Ar-Raudhah. Privacy Policy.</div>
+      <div>f &nbsp; ◎</div>
+    </div>
+  </footer>
+</body>
+</html>
