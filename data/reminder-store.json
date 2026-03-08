@@ -1,66 +1,50 @@
 {
   "donors": [
     {
-      "applicationId": "SP-2026-1250",
-      "submittedAt": "2026-03-07T17:50:03.532Z",
-      "updatedAt": null,
-      "terminatedAt": null,
+      "applicationId": "SP-MOCK-2003",
+      "submittedAt": "2025-11-06T00:00:00+00:00",
+      "updatedAt": "2026-02-24T00:00:00+00:00",
+      "terminatedAt": "2026-02-24T00:00:00+00:00",
       "donor": {
-        "fullName": "Nur Aisyah Binte Rahman",
-        "nric": "S8123456A",
-        "mobile": "+65 9123 9876",
-        "email": "nur.aisyah@singpass.demo",
-        "address": "Blk 120 Bedok North Street 2, #07-219, Singapore 460120",
-        "contribution": 10,
-        "group": "Skim Pintar Group",
-        "notifyChannel": "whatsapp",
-        "egiroBank": "DBS/POSB",
-        "egiroAccount": "123-456789-0",
-        "egiroAccountHolder": "Adil",
-        "egiroDeductionDay": "1",
-        "egiroStartMonth": "2026-04",
-        "authUserId": "sp_1772869595252_z9hme4",
-        "authUserEmail": "nur.aisyah@singpass.demo"
+        "fullName": "Hafiz Bin Karim",
+        "nric": "S7654321F",
+        "mobile": "93456789",
+        "email": "hafiz.karim.mock03@skim-pintar.mock",
+        "address": "Blk 332 Jurong East St 31, #10-201, Singapore 600332",
+        "contribution": 30,
+        "group": "Skim Pintar Plus",
+        "notifyChannel": "email",
+        "egiroBank": "UOB",
+        "egiroAccount": "3456789012",
+        "egiroAccountHolder": "Hafiz Bin Karim",
+        "egiroDeductionDay": "10",
+        "egiroStartMonth": "2024-12",
+        "authUserId": "usr_mock_plus_ended",
+        "authUserEmail": "hafiz.karim.mock03@skim-pintar.mock"
       },
-      "relatives": []
-    },
-    {
-      "applicationId": "SP-MOCK-2001",
-      "submittedAt": "2026-01-26T19:08:50.467Z",
-      "updatedAt": null,
-      "terminatedAt": null,
-      "donor": {
-        "fullName": "Ahmad Bin Yusof",
-        "nric": "S9123456A",
-        "mobile": "91234567",
-        "email": "basic.active@skim-pintar.test",
-        "address": "Blk 101 Bukit Batok West Ave 6, #08-112, Singapore 650101",
-        "contribution": 8,
-        "group": "Skim Pintar Group",
-        "notifyChannel": "whatsapp",
-        "egiroBank": "DBS/POSB",
-        "egiroAccount": "1234567890",
-        "egiroAccountHolder": "Ahmad Bin Yusof",
-        "egiroDeductionDay": "1",
-        "egiroStartMonth": "2025-07",
-        "authUserId": "usr_mock_basic_active",
-        "authUserEmail": "basic.active@skim-pintar.test"
-      },
-      "relatives": []
+      "relatives": [
+        {
+          "fullName": "Nurul Bte Hafiz",
+          "dateOfBirth": "2010-07-20",
+          "relationship": "Daughter",
+          "addressType": "same-address",
+          "address": ""
+        }
+      ]
     },
     {
       "applicationId": "SP-MOCK-2002",
-      "submittedAt": "2026-01-01T19:08:50.467Z",
-      "updatedAt": null,
+      "submittedAt": "2025-12-31T00:00:00+00:00",
+      "updatedAt": "2025-12-31T00:00:00+00:00",
       "terminatedAt": null,
       "donor": {
         "fullName": "Nur Ain Bte Salleh",
-        "nric": "T0345678B",
+        "nric": "T0345678H",
         "mobile": "92345678",
-        "email": "plus.active@skim-pintar.test",
+        "email": "nurain.salleh.mock02@skim-pintar.mock",
         "address": "Blk 210 Choa Chu Kang Ave 3, #05-88, Singapore 680210",
         "contribution": 25,
-        "group": "Skim Pintar Plus Group",
+        "group": "Skim Pintar Plus",
         "notifyChannel": "whatsapp",
         "egiroBank": "OCBC",
         "egiroAccount": "2345678901",
@@ -68,73 +52,69 @@
         "egiroDeductionDay": "5",
         "egiroStartMonth": "2025-05",
         "authUserId": "usr_mock_plus_active",
-        "authUserEmail": "plus.active@skim-pintar.test"
+        "authUserEmail": "nurain.salleh.mock02@skim-pintar.mock"
       },
       "relatives": [
         {
           "fullName": "Salleh Bin Rahman",
           "dateOfBirth": "1985-02-15",
           "relationship": "Husband",
-          "addressType": "same-address"
+          "addressType": "same-address",
+          "address": ""
         },
         {
           "fullName": "Aisha Bte Salleh",
           "dateOfBirth": "2012-09-03",
           "relationship": "Daughter",
-          "addressType": "same-address"
+          "addressType": "same-address",
+          "address": ""
         },
         {
           "fullName": "Ramlah Bte Osman",
+          "dateOfBirth": "",
           "relationship": "Mother",
-          "address": "Blk 318 Woodlands Street 31, #02-54, Singapore 730318",
-          "addressType": "different-address"
+          "addressType": "different-address",
+          "address": "Blk 318 Woodlands Street 31, #02-54, Singapore 730318"
         }
       ]
     },
     {
-      "applicationId": "SP-MOCK-2003",
-      "submittedAt": "2025-11-07T19:08:50.467Z",
-      "updatedAt": null,
-      "terminatedAt": "2026-02-23T19:08:50.467Z",
+      "applicationId": "SP-MOCK-2001",
+      "submittedAt": "2026-01-28T00:00:00+00:00",
+      "updatedAt": "2026-01-28T00:00:00+00:00",
+      "terminatedAt": null,
       "donor": {
-        "fullName": "Hafiz Bin Karim",
-        "nric": "S7654321C",
-        "mobile": "93456789",
-        "email": "plus.ended@skim-pintar.test",
-        "address": "Blk 332 Jurong East St 31, #10-201, Singapore 600332",
-        "contribution": 30,
-        "group": "Skim Pintar Plus Group",
-        "notifyChannel": "whatsapp",
-        "egiroBank": "UOB",
-        "egiroAccount": "3456789012",
-        "egiroAccountHolder": "Hafiz Bin Karim",
-        "egiroDeductionDay": "10",
-        "egiroStartMonth": "2025-01",
-        "authUserId": "usr_mock_plus_ended",
-        "authUserEmail": "plus.ended@skim-pintar.test"
+        "fullName": "Ahmad Bin Yusof",
+        "nric": "S9123456D",
+        "mobile": "91234567",
+        "email": "ahmad.yusof.mock01@skim-pintar.mock",
+        "address": "Blk 101 Bukit Batok West Ave 6, #08-112, Singapore 650101",
+        "contribution": 8,
+        "group": "Skim Pintar Basic",
+        "notifyChannel": "sms",
+        "egiroBank": "DBS/POSB",
+        "egiroAccount": "1234567890",
+        "egiroAccountHolder": "Ahmad Bin Yusof",
+        "egiroDeductionDay": "1",
+        "egiroStartMonth": "2025-07",
+        "authUserId": "usr_mock_basic_active",
+        "authUserEmail": "ahmad.yusof.mock01@skim-pintar.mock"
       },
-      "relatives": [
-        {
-          "fullName": "Nurul Bte Hafiz",
-          "dateOfBirth": "2010-07-20",
-          "relationship": "Daughter",
-          "addressType": "same-address"
-        }
-      ]
+      "relatives": []
     },
     {
       "applicationId": "SP-MOCK-2004",
-      "submittedAt": "2026-03-04T19:08:50.467Z",
-      "updatedAt": null,
+      "submittedAt": "2026-03-05T00:00:00+00:00",
+      "updatedAt": "2026-03-05T00:00:00+00:00",
       "terminatedAt": null,
       "donor": {
         "fullName": "Siti Mariam Bte Osman",
-        "nric": "T1122334D",
+        "nric": "T1122334B",
         "mobile": "94567890",
-        "email": "processing.member@skim-pintar.test",
+        "email": "siti.mariam.mock04@skim-pintar.mock",
         "address": "Blk 55 Tampines Street 11, #04-99, Singapore 521055",
         "contribution": 6.5,
-        "group": "Skim Pintar Group",
+        "group": "Skim Pintar Basic",
         "notifyChannel": "whatsapp",
         "egiroBank": "Maybank",
         "egiroAccount": "4567890123",
@@ -142,67 +122,30 @@
         "egiroDeductionDay": "1",
         "egiroStartMonth": "2026-03",
         "authUserId": "usr_mock_processing",
-        "authUserEmail": "processing.member@skim-pintar.test"
+        "authUserEmail": "siti.mariam.mock04@skim-pintar.mock"
       },
       "relatives": []
     },
     {
-      "applicationId": "SP-2026-1251",
-      "submittedAt": "2026-03-07T20:32:21.354Z",
-      "updatedAt": "2026-03-07T20:32:39.287Z",
-      "terminatedAt": null,
-      "donor": {
-        "fullName": "Nur Aisyah Binte Rahman",
-        "nric": "S8123456A",
-        "mobile": "6591239876",
-        "email": "nur.aisyah@singpass.demo",
-        "address": "Blk 120 Bedok North Street 2, #07-219, Singapore 460120",
-        "contribution": 20,
-        "group": "Skim Pintar Plus Group",
-        "notifyChannel": "whatsapp",
-        "egiroBank": "DBS/POSB",
-        "egiroAccount": "1234567890",
-        "egiroAccountHolder": "Adil",
-        "egiroDeductionDay": "5",
-        "egiroStartMonth": "2026-05",
-        "authUserId": "",
-        "authUserEmail": ""
-      },
-      "relatives": [
-        {
-          "fullName": "Adil Hadi",
-          "dateOfBirth": "2025-06-10",
-          "relationship": "Wife",
-          "addressType": "same-address"
-        },
-        {
-          "fullName": "ADAM HILMI",
-          "relationship": "Mother-in-law",
-          "address": "688F Woodlands Drive 75",
-          "addressType": "different-address"
-        }
-      ]
-    },
-    {
-      "applicationId": "SP-2026-1252",
-      "submittedAt": "2026-03-07T21:04:06.791Z",
-      "updatedAt": "2026-03-07T21:58:31.135Z",
+      "applicationId": "SP-2026-1249",
+      "submittedAt": "2026-03-08T04:28:17.319Z",
+      "updatedAt": null,
       "terminatedAt": null,
       "donor": {
         "fullName": "Adil Hadi",
         "nric": "T0315228B",
         "mobile": "98632032",
         "email": "adilhadizul@gmail.com",
-        "address": "BLK 688E WOODLANDS DRIVE 75",
-        "contribution": 100,
-        "group": "Skim Pintar Plus Group",
-        "notifyChannel": "email",
-        "egiroBank": "DBS/POSB",
-        "egiroAccount": "1234567890",
-        "egiroAccountHolder": "Adil",
-        "egiroDeductionDay": "5",
-        "egiroStartMonth": "2026-03",
-        "authUserId": "usr_1772896069926_jvlh33",
+        "address": "Blk 120 Bedok North Street 2, #07-219, Singapore 460120",
+        "contribution": 10,
+        "group": "Skim Pintar Basic",
+        "notifyChannel": "whatsapp",
+        "egiroBank": "",
+        "egiroAccount": "",
+        "egiroAccountHolder": "",
+        "egiroDeductionDay": "",
+        "egiroStartMonth": "",
+        "authUserId": "usr_1772944067062_rcdxo6",
         "authUserEmail": "adilhadizul@gmail.com"
       },
       "relatives": []
@@ -225,6 +168,206 @@
   },
   "reactivationRequests": [],
   "deliveryLog": [
+    {
+      "timestamp": "2026-03-08T05:09:36.830Z",
+      "source": "scheduled-cycle",
+      "manual": true,
+      "dedupeKey": "SP-2026-1251:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-2026-1251",
+      "donorName": "Nur Aisyah Binte Rahman",
+      "donorNric": "S8123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (403): {\"statusCode\":403,\"name\":\"validation_error\",\"message\":\"You can only send testing emails to your own email address (adilhadizul@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\"}"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-03-08T05:09:36.432Z",
+      "source": "scheduled-cycle",
+      "manual": true,
+      "dedupeKey": "SP-2026-1251:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-2026-1251",
+      "donorName": "Nur Aisyah Binte Rahman",
+      "donorNric": "S8123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (429): {\"statusCode\":429,\"name\":\"rate_limit_exceeded\",\"message\":\"Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.\"}"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-03-08T05:09:36.085Z",
+      "source": "scheduled-cycle",
+      "manual": true,
+      "dedupeKey": "SP-MOCK-2004:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-MOCK-2004",
+      "donorName": "Siti Mariam Bte Osman",
+      "donorNric": "T1122334D",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (403): {\"statusCode\":403,\"name\":\"validation_error\",\"message\":\"You can only send testing emails to your own email address (adilhadizul@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\"}"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-03-08T05:09:35.719Z",
+      "source": "scheduled-cycle",
+      "manual": true,
+      "dedupeKey": "SP-MOCK-2004:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-MOCK-2004",
+      "donorName": "Siti Mariam Bte Osman",
+      "donorNric": "T1122334D",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (403): {\"statusCode\":403,\"name\":\"validation_error\",\"message\":\"You can only send testing emails to your own email address (adilhadizul@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\"}"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-03-08T05:09:35.348Z",
+      "source": "scheduled-cycle",
+      "manual": true,
+      "dedupeKey": "SP-MOCK-2002:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-MOCK-2002",
+      "donorName": "Nur Ain Bte Salleh",
+      "donorNric": "T0345678B",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (429): {\"statusCode\":429,\"name\":\"rate_limit_exceeded\",\"message\":\"Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.\"}"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-03-08T05:09:35.035Z",
+      "source": "scheduled-cycle",
+      "manual": true,
+      "dedupeKey": "SP-MOCK-2002:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-MOCK-2002",
+      "donorName": "Nur Ain Bte Salleh",
+      "donorNric": "T0345678B",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (403): {\"statusCode\":403,\"name\":\"validation_error\",\"message\":\"You can only send testing emails to your own email address (adilhadizul@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\"}"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-03-08T05:09:34.726Z",
+      "source": "scheduled-cycle",
+      "manual": true,
+      "dedupeKey": "SP-MOCK-2001:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-MOCK-2001",
+      "donorName": "Ahmad Bin Yusof",
+      "donorNric": "S9123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (403): {\"statusCode\":403,\"name\":\"validation_error\",\"message\":\"You can only send testing emails to your own email address (adilhadizul@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\"}"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-03-08T05:09:34.192Z",
+      "source": "scheduled-cycle",
+      "manual": true,
+      "dedupeKey": "SP-MOCK-2001:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-MOCK-2001",
+      "donorName": "Ahmad Bin Yusof",
+      "donorNric": "S9123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (429): {\"statusCode\":429,\"name\":\"rate_limit_exceeded\",\"message\":\"Too many requests. You can only make 2 requests per second. See rate limit response headers for more information. Or contact support to increase rate limit.\"}"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-03-08T05:09:33.769Z",
+      "source": "scheduled-cycle",
+      "manual": true,
+      "dedupeKey": "SP-2026-1250:2026-03:payment_overdue",
+      "eventType": "payment_overdue",
+      "applicationId": "SP-2026-1250",
+      "donorName": "Nur Aisyah Binte Rahman",
+      "donorNric": "S8123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (403): {\"statusCode\":403,\"name\":\"validation_error\",\"message\":\"You can only send testing emails to your own email address (adilhadizul@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\"}"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-03-08T05:09:33.354Z",
+      "source": "scheduled-cycle",
+      "manual": true,
+      "dedupeKey": "SP-2026-1250:2026-03:payment_missed",
+      "eventType": "payment_missed",
+      "applicationId": "SP-2026-1250",
+      "donorName": "Nur Aisyah Binte Rahman",
+      "donorNric": "S8123456A",
+      "channelResult": {
+        "channel": "whatsapp",
+        "status": "skipped",
+        "detail": "TWILIO_WHATSAPP_FROM not configured",
+        "fallbackAttempt": {
+          "channel": "email",
+          "status": "failed",
+          "detail": "Resend API failed (403): {\"statusCode\":403,\"name\":\"validation_error\",\"message\":\"You can only send testing emails to your own email address (adilhadizul@gmail.com). To send emails to other recipients, please verify a domain at resend.com/domains, and change the `from` address to an email using this domain.\"}"
+        }
+      }
+    },
     {
       "timestamp": "2026-03-08T05:07:43.071Z",
       "source": "scheduled-cycle",
@@ -756,6 +899,6 @@
       }
     }
   ],
-  "lastSyncAt": "2026-03-07T22:30:12.714Z",
-  "updatedAt": "2026-03-08T05:07:43.071Z"
+  "lastSyncAt": "2026-03-08T05:14:50.971Z",
+  "updatedAt": "2026-03-08T05:14:50.971Z"
 }

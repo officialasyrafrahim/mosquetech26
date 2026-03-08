@@ -1612,7 +1612,7 @@ select.form-control {
         <div class="receipt-row"><span>Payment</span><strong id="rc-pay">🏦 eGIRO (Recurring)</strong></div>
         <div class="receipt-row"><span>Payment Setup</span><strong id="rc-recur">Selected payment method</strong></div>
         <div class="receipt-row"><span>Family Members</span><strong id="rc-family">No family members added</strong></div>
-        <div class="receipt-row"><span>Processing</span><strong id="rc-processing" class="text-teal">Within 7 days ⚡</strong></div>
+        <div class="receipt-row"><span>Processing</span><strong id="rc-processing" class="text-teal">Instant activation ⚡</strong></div>
         <div class="receipt-row total"><span id="rc-amount-label">Monthly Amount</span><span id="rc-amount">$5.00</span></div>
       </div>
       <div class="banner banner-gold" style="margin-bottom:16px">
@@ -1632,12 +1632,12 @@ select.form-control {
       <div class="success-screen">
         <span class="big-tick">🎉</span>
         <div style="font-family:'Amiri',serif;font-size:22px;color:var(--teal);margin-bottom:6px">الحمد لله</div>
-        <h2 id="join-success-title">Application Submitted!</h2>
-        <p id="join-success-subtitle">Permohonan anda telah dihantar</p>
+        <h2 id="join-success-title">Membership Activated!</h2>
+        <p id="join-success-subtitle">Keahlian anda kini aktif</p>
       </div>
       <div class="receipt">
         <div class="receipt-row"><span id="join-success-id-label">Application ID</span><strong id="success-app-id" class="text-teal" style="font-size:20px">SP-2026-1248</strong></div>
-        <div class="receipt-row"><span id="join-success-next-label">Expected Activation</span><strong id="join-success-next-text" class="text-teal">Within 7 days</strong></div>
+        <div class="receipt-row"><span id="join-success-next-label">Activation</span><strong id="join-success-next-text" class="text-teal">Immediate</strong></div>
         <div class="receipt-row"><span id="join-success-note-label">WhatsApp Update</span><strong id="join-success-note-text">Sent to your mobile ✓</strong></div>
       </div>
       <div class="banner banner-green mt-4">
@@ -1714,13 +1714,13 @@ select.form-control {
         <div id="track-name" style="font-size:20px;font-weight:900;color:var(--slate)">—</div>
         <div id="track-meta" class="text-sm text-muted">—</div>
       </div>
-      <span id="track-badge" class="badge badge-process">⏳ In Progress</span>
+      <span id="track-badge" class="badge badge-active">✅ Active</span>
     </div>
 
     <div style="background:var(--teal-pale);border-radius:16px;padding:24px;margin-bottom:20px;text-align:center">
       <div style="font-size:18px;font-weight:900;color:var(--teal-dark);margin-bottom:4px">Current Step:</div>
-      <div id="track-step" style="font-size:22px;font-weight:900;color:var(--teal)">🏦 Bank Validation</div>
-      <div id="track-estimate" style="font-size:16px;color:var(--muted);margin-top:6px">Estimated: <strong style="color:var(--teal)">2 more days</strong></div>
+      <div id="track-step" style="font-size:22px;font-weight:900;color:var(--teal)">✅ Membership Active</div>
+      <div id="track-estimate" style="font-size:16px;color:var(--muted);margin-top:6px">Activation: <strong style="color:var(--teal)">Immediate</strong></div>
     </div>
 
     <div class="divider"></div>
@@ -2954,17 +2954,17 @@ function applyJoinModeUi() {
     ? 'Please review your updates before saving.'
     : 'Please check all details are correct before submitting.';
   if (submitBtn) submitBtn.innerHTML = joinIsEdit ? '💾 &nbsp; Save My Changes' : '✅ &nbsp; Submit My Application';
-  if (successTitle) successTitle.textContent = joinIsEdit ? 'Details Updated!' : 'Application Submitted!';
-  if (successSubtitle) successSubtitle.textContent = joinIsEdit ? 'Maklumat skim anda telah dikemaskini' : 'Permohonan anda telah dihantar';
+  if (successTitle) successTitle.textContent = joinIsEdit ? 'Details Updated!' : 'Membership Activated!';
+  if (successSubtitle) successSubtitle.textContent = joinIsEdit ? 'Maklumat skim anda telah dikemaskini' : 'Keahlian anda kini aktif';
   if (successIdLabel) successIdLabel.textContent = joinIsEdit ? 'Membership ID' : 'Application ID';
-  if (successNextLabel) successNextLabel.textContent = joinIsEdit ? 'Update Status' : 'Expected Activation';
-  if (successNextText) successNextText.textContent = joinIsEdit ? 'Saved successfully' : 'Within 7 days';
+  if (successNextLabel) successNextLabel.textContent = joinIsEdit ? 'Update Status' : 'Activation';
+  if (successNextText) successNextText.textContent = joinIsEdit ? 'Saved successfully' : 'Immediate';
   if (successNoteLabel) successNoteLabel.textContent = joinIsEdit ? 'Confirmation' : 'WhatsApp Update';
   if (successNoteText) successNoteText.textContent = joinIsEdit ? 'Changes synced to your member profile ✓' : 'Sent to your mobile ✓';
-  if (processingText) processingText.textContent = joinIsEdit ? 'Saved immediately ⚡' : 'Within 7 days ⚡';
+  if (processingText) processingText.textContent = joinIsEdit ? 'Saved immediately ⚡' : 'Instant activation ⚡';
   if (successBannerText) successBannerText.textContent = joinIsEdit
     ? 'Your membership details were updated and synced to your profile.'
-    : 'You will receive step-by-step WhatsApp updates. No need to call the mosque!';
+    : 'Your membership is active now. You will continue receiving WhatsApp updates and reminders.';
   if (trackBtn) trackBtn.textContent = joinIsEdit ? '🔍 View My Status' : '🔍 Track My Application';
 }
 
@@ -2977,29 +2977,11 @@ function resolveMembershipStatus(record) {
       estimateText: `Ended on ${formatDate(record.terminatedAt, '—')}`
     };
   }
-  const createdAt = new Date(record?.submittedAt || Date.now());
-  const ageDays = Math.floor((Date.now() - createdAt.getTime()) / 86400000);
-  if (ageDays >= 7) {
-    return {
-      badgeText: '✅ Active',
-      badgeClass: 'badge badge-active',
-      stepText: '✅ Membership Active',
-      estimateText: 'Coverage is active and protected.'
-    };
-  }
-  if (ageDays >= 2) {
-    return {
-      badgeText: '⏳ In Progress',
-      badgeClass: 'badge badge-process',
-      stepText: '🏦 Bank Validation',
-      estimateText: 'Estimated: 2 more days'
-    };
-  }
   return {
-    badgeText: '📝 Submitted',
-    badgeClass: 'badge badge-pending',
-    stepText: '📋 Submission Received',
-    estimateText: 'Estimated: 5-7 days for activation'
+    badgeText: '✅ Active',
+    badgeClass: 'badge badge-active',
+    stepText: '✅ Membership Active',
+    estimateText: 'Activation is immediate.'
   };
 }
 
@@ -3696,9 +3678,7 @@ function renderTrackScreen() {
   }
   if (trackStep) trackStep.textContent = status.stepText;
   if (trackEstimate) {
-    trackEstimate.innerHTML = ended
-      ? `<strong style="color:var(--teal)">${esc(status.estimateText)}</strong>`
-      : `Estimated: <strong style="color:var(--teal)">${esc(status.estimateText.replace(/^Estimated:\s*/, ''))}</strong>`;
+    trackEstimate.innerHTML = `<strong style="color:var(--teal)">${esc(status.estimateText)}</strong>`;
   }
 
   if (trackUpdates) {
@@ -5965,7 +5945,7 @@ function joinStep(n, options = {}) {
     }
     document.getElementById('rc-family').textContent = summarizeFamilyMembers();
     const processingEl = document.getElementById('rc-processing');
-    if (processingEl) processingEl.textContent = joinScreenMode === 'edit' ? 'Saved immediately ⚡' : 'Within 7 days ⚡';
+    if (processingEl) processingEl.textContent = joinScreenMode === 'edit' ? 'Saved immediately ⚡' : 'Instant activation ⚡';
     document.getElementById('rc-amount').textContent = amountText;
   }
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -6114,7 +6094,7 @@ ABOUT SKIM PINTAR:
 - Community welfare scheme, Masjid Ar-Raudhah, Singapore
 - Skim Pintar Basic: monthly contribution starts from $5, individual benefits + 20% course discount
 - Skim Pintar Plus: monthly contribution $20 and above, family coverage + 50% discount for parents/in-laws
-- Old process: 21–30 day paper GIRO; New process: under 7 days via SingPass + eGIRO/HitPay setup
+- Digital process: instant approval and setup via SingPass + eGIRO/HitPay
 - Payment: eGIRO recurring, or HitPay recurring/one-time
 - No cryptocurrency, no riba — MAS compliant
 - Members notified before failed deductions, during grace period, and can use one-click reactivation
