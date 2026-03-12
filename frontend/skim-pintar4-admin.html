@@ -404,6 +404,11 @@ const ADMIN_SYNC_KEYS = new Set([
   AUTH_EVENTS_KEY,
   ADMIN_SYNC_PULSE_KEY
 ]);
+const ADMIN_SERVER_SYNC_KEY_ENDPOINTS = {
+  [DONOR_RECORDS_KEY]: '/donor-records',
+  [MEMBER_DIRECTORY_KEY]: '/member-directory',
+  [AUTH_EVENTS_KEY]: '/auth-events'
+};
 
 let adminSyncChannel = null;
 if ('BroadcastChannel' in window) {
@@ -455,6 +460,11 @@ let adminState = {
   source: 'local'
 };
 let pendingCancelApplicationId = '';
+let adminSyncInFlight = false;
+let adminServerSyncEnabled = false;
+let adminLastServerSignature = '';
+const adminPendingServerPersistKeys = new Set();
+const adminServerPersistInFlightKeys = new Set();
 
 async function apiRequest(path, options = {}) {
   const resp = await fetch(`${API_BASE_URL}${path}`, {
@@ -465,22 +475,120 @@ async function apiRequest(path, options = {}) {
   return resp.status === 204 ? null : resp.json();
 }
 
-async function loadAdminState() {
-  try {
-    const data = await apiRequest('/bootstrap');
-    adminState.donorRecords = Array.isArray(data?.donorRecords) ? data.donorRecords : [];
-    adminState.memberDirectory = Array.isArray(data?.memberDirectory) ? data.memberDirectory : [];
-    adminState.authEvents = Array.isArray(data?.authEvents) ? data.authEvents : [];
-    adminState.syncPulse = data?.syncPulse || null;
-    adminState.source = 'api';
-    return;
-  } catch (_) {}
-
-  adminState.donorRecords = Array.isArray(safeReadJson(DONOR_RECORDS_KEY, [])) ? safeReadJson(DONOR_RECORDS_KEY, []) : [];
-  adminState.memberDirectory = Array.isArray(safeReadJson(MEMBER_DIRECTORY_KEY, [])) ? safeReadJson(MEMBER_DIRECTORY_KEY, []) : [];
-  adminState.authEvents = Array.isArray(safeReadJson(AUTH_EVENTS_KEY, [])) ? safeReadJson(AUTH_EVENTS_KEY, []) : [];
+function loadAdminStateFromLocalCache() {
+  const donorRecords = safeReadJson(DONOR_RECORDS_KEY, []);
+  const memberDirectory = safeReadJson(MEMBER_DIRECTORY_KEY, []);
+  const authEvents = safeReadJson(AUTH_EVENTS_KEY, []);
+  adminState.donorRecords = Array.isArray(donorRecords) ? donorRecords : [];
+  adminState.memberDirectory = Array.isArray(memberDirectory) ? memberDirectory : [];
+  adminState.authEvents = Array.isArray(authEvents) ? authEvents : [];
   adminState.syncPulse = safeReadJson(ADMIN_SYNC_PULSE_KEY, null);
   adminState.source = 'local';
+}
+
+function buildAdminServerSignature(data) {
+  const pulseTs = String(data?.syncPulse?.timestamp || '');
+  const pulseSource = String(data?.syncPulse?.sourceKey || data?.syncPulse?.source || '');
+  const donorLen = Array.isArray(data?.donorRecords) ? data.donorRecords.length : -1;
+  const memberLen = Array.isArray(data?.memberDirectory) ? data.memberDirectory.length : -1;
+  const authLen = Array.isArray(data?.authEvents) ? data.authEvents.length : -1;
+  const donorCounter = Number(data?.donorCounter);
+  const counterSig = Number.isFinite(donorCounter) ? Math.max(0, Math.trunc(donorCounter)) : '';
+  return `${pulseTs}|${pulseSource}|${donorLen}|${memberLen}|${authLen}|${counterSig}`;
+}
+
+function cacheAdminStateLocally(options = {}) {
+  try {
+    localStorage.setItem(DONOR_RECORDS_KEY, JSON.stringify(Array.isArray(adminState.donorRecords) ? adminState.donorRecords : []));
+    localStorage.setItem(MEMBER_DIRECTORY_KEY, JSON.stringify(Array.isArray(adminState.memberDirectory) ? adminState.memberDirectory : []));
+    localStorage.setItem(AUTH_EVENTS_KEY, JSON.stringify(Array.isArray(adminState.authEvents) ? adminState.authEvents : []));
+    if (adminState.syncPulse) {
+      localStorage.setItem(ADMIN_SYNC_PULSE_KEY, JSON.stringify(adminState.syncPulse));
+    }
+    if (options.notify) notifyAdminSync(options.sourceKey || 'admin-bootstrap');
+  } catch (_) {
+    // ignore cache failures
+  }
+}
+
+function applyAdminBootstrapData(data, options = {}) {
+  const signature = buildAdminServerSignature(data);
+  const force = Boolean(options.force);
+  if (!force && signature && signature === adminLastServerSignature && adminPendingServerPersistKeys.size === 0) {
+    adminServerSyncEnabled = true;
+    adminState.source = 'api';
+    return false;
+  }
+  adminState.donorRecords = Array.isArray(data?.donorRecords) ? data.donorRecords : [];
+  adminState.memberDirectory = Array.isArray(data?.memberDirectory) ? data.memberDirectory : [];
+  adminState.authEvents = Array.isArray(data?.authEvents) ? data.authEvents : [];
+  adminState.syncPulse = data?.syncPulse || null;
+  adminState.source = 'api';
+  adminLastServerSignature = signature;
+  adminServerSyncEnabled = true;
+  cacheAdminStateLocally({ notify: true, sourceKey: options.sourceKey || 'admin-bootstrap' });
+  return true;
+}
+
+async function persistAdminKeyToServer(key, value) {
+  const path = ADMIN_SERVER_SYNC_KEY_ENDPOINTS[key];
+  if (!path) return true;
+  adminPendingServerPersistKeys.add(key);
+  if (adminServerPersistInFlightKeys.has(key)) return false;
+
+  adminServerPersistInFlightKeys.add(key);
+  try {
+    await apiRequest(path, {
+      method: 'PUT',
+      body: JSON.stringify(value)
+    });
+    adminPendingServerPersistKeys.delete(key);
+    adminServerSyncEnabled = true;
+    adminState.source = 'api';
+    return true;
+  } catch (_) {
+    adminServerSyncEnabled = false;
+    adminState.source = 'local';
+    return false;
+  } finally {
+    adminServerPersistInFlightKeys.delete(key);
+  }
+}
+
+async function flushAdminPendingServerWrites() {
+  if (!adminPendingServerPersistKeys.size) return true;
+  const keys = Array.from(adminPendingServerPersistKeys);
+  for (const key of keys) {
+    if (adminServerPersistInFlightKeys.has(key)) return false;
+    const payload = key === DONOR_RECORDS_KEY
+      ? getDonorRecords()
+      : key === MEMBER_DIRECTORY_KEY
+        ? getMemberDirectory()
+        : getAuthEvents();
+    const ok = await persistAdminKeyToServer(key, payload);
+    if (!ok) return false;
+  }
+  return adminPendingServerPersistKeys.size === 0;
+}
+
+async function loadAdminState(options = {}) {
+  if (adminPendingServerPersistKeys.size > 0) {
+    const flushed = await flushAdminPendingServerWrites();
+    if (!flushed) {
+      loadAdminStateFromLocalCache();
+      return false;
+    }
+  }
+
+  try {
+    const data = await apiRequest('/bootstrap');
+    applyAdminBootstrapData(data, options);
+    return true;
+  } catch (_) {
+    adminServerSyncEnabled = false;
+    loadAdminStateFromLocalCache();
+    return false;
+  }
 }
 
 function getDonorRecords() {
@@ -583,16 +691,10 @@ async function saveDonorRecords(records) {
   if (savedLocal) {
     adminState.donorRecords = safeRecords;
   }
-  if (adminState.source === 'api') {
-    await apiRequest('/donor-records', {
-      method: 'PUT',
-      body: JSON.stringify(safeRecords)
-    });
-    syncDonorRecordsToReminderService(safeRecords);
-    return;
-  }
   if (!savedLocal) throw new Error('Unable to save donor records to local storage.');
+  const persisted = await persistAdminKeyToServer(DONOR_RECORDS_KEY, safeRecords);
   syncDonorRecordsToReminderService(safeRecords);
+  return { persisted };
 }
 
 function getMemberDirectory() {
@@ -609,14 +711,9 @@ async function saveAuthEvents(events) {
   if (savedLocal) {
     adminState.authEvents = safeEvents;
   }
-  if (adminState.source === 'api') {
-    await apiRequest('/auth-events', {
-      method: 'PUT',
-      body: JSON.stringify(safeEvents)
-    });
-    return;
-  }
   if (!savedLocal) throw new Error('Unable to save auth events to local storage.');
+  const persisted = await persistAdminKeyToServer(AUTH_EVENTS_KEY, safeEvents);
+  return { persisted };
 }
 
 function esc(value) {
@@ -1003,7 +1100,7 @@ async function confirmAdminCancellation() {
   }
 
   try {
-    await saveDonorRecords(records);
+    const donorSaveResult = await saveDonorRecords(records);
     const events = getAuthEvents();
     events.push({
       eventId: `evt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
@@ -1018,7 +1115,8 @@ async function confirmAdminCancellation() {
       reason
     });
     if (events.length > 5000) events.splice(0, events.length - 5000);
-    await saveAuthEvents(events);
+    const authSaveResult = await saveAuthEvents(events);
+    const queuedForSync = !donorSaveResult?.persisted || !authSaveResult?.persisted;
     const dedupeDate = String(updated.terminatedAt || '').slice(0, 10) || new Date().toISOString().slice(0, 10);
     const notificationResult = await postNotificationEvent('donation_stopped', {
       record: updated,
@@ -1027,9 +1125,11 @@ async function confirmAdminCancellation() {
     });
     if (msgEl) {
       const baseMessage = `Subscriber ${appId} cancelled at ${new Date(updated.terminatedAt).toLocaleString('en-SG')}.`;
-      msgEl.textContent = notificationResult.ok
-        ? baseMessage
-        : `${baseMessage} Reminder event failed to send (${notificationResult.error || 'unknown error'}).`;
+      const syncMessage = queuedForSync ? ' API offline: change queued and will auto-sync.' : '';
+      const notifyMessage = notificationResult.ok
+        ? ''
+        : ` Reminder event failed to send (${notificationResult.error || 'unknown error'}).`;
+      msgEl.textContent = `${baseMessage}${syncMessage}${notifyMessage}`;
     }
     refreshAdminDashboard();
   } catch (error) {
@@ -1080,70 +1180,81 @@ function getLastUpdatedTimestamp(records, members, authEvents) {
   return latest ? new Date(latest).toISOString() : '';
 }
 
-async function refreshAdminDashboard() {
-  await loadAdminState();
-  const records = getDonorRecords();
-  const members = getMemberDirectory();
-  const authEvents = getAuthEvents();
+async function refreshAdminDashboard(options = {}) {
+  if (adminSyncInFlight) return;
+  adminSyncInFlight = true;
+  try {
+    await loadAdminState(options);
+    const records = getDonorRecords();
+    const members = getMemberDirectory();
+    const authEvents = getAuthEvents();
 
-  const monthStart = getMonthStartTime();
-  const now = Date.now();
-  const authSince = now - (24 * 60 * 60 * 1000);
+    const monthStart = getMonthStartTime();
+    const now = Date.now();
+    const authSince = now - (24 * 60 * 60 * 1000);
 
-  const monthlyContributionTotal = records.reduce((sum, record) => {
-    const submitted = new Date(record?.submittedAt || 0).getTime();
-    const amount = Number(record?.donor?.contribution);
-    if (!Number.isFinite(submitted) || submitted < monthStart || !Number.isFinite(amount)) return sum;
-    return sum + amount;
-  }, 0);
+    const monthlyContributionTotal = records.reduce((sum, record) => {
+      const submitted = new Date(record?.submittedAt || 0).getTime();
+      const amount = Number(record?.donor?.contribution);
+      if (!Number.isFinite(submitted) || submitted < monthStart || !Number.isFinite(amount)) return sum;
+      return sum + amount;
+    }, 0);
 
-  const membersThisMonth = members.reduce((sum, member) => {
-    const created = new Date(member?.firstRegisteredAt || 0).getTime();
-    if (!Number.isFinite(created) || created < monthStart) return sum;
-    return sum + 1;
-  }, 0);
+    const membersThisMonth = members.reduce((sum, member) => {
+      const created = new Date(member?.firstRegisteredAt || 0).getTime();
+      if (!Number.isFinite(created) || created < monthStart) return sum;
+      return sum + 1;
+    }, 0);
 
-  const authEvents24h = authEvents.reduce((sum, evt) => {
-    const ts = new Date(evt?.timestamp || 0).getTime();
-    if (!Number.isFinite(ts) || ts < authSince) return sum;
-    return sum + 1;
-  }, 0);
+    const authEvents24h = authEvents.reduce((sum, evt) => {
+      const ts = new Date(evt?.timestamp || 0).getTime();
+      if (!Number.isFinite(ts) || ts < authSince) return sum;
+      return sum + 1;
+    }, 0);
 
-  const totalRelatives = records.reduce((sum, record) => {
-    const relatives = Array.isArray(record?.relatives) ? record.relatives.length : 0;
-    return sum + relatives;
-  }, 0);
+    const totalRelatives = records.reduce((sum, record) => {
+      const relatives = Array.isArray(record?.relatives) ? record.relatives.length : 0;
+      return sum + relatives;
+    }, 0);
 
-  const lastSynced = getLastUpdatedTimestamp(records, members, authEvents);
-  const syncSourceEl = document.getElementById('admin-sync-source');
-  if (syncSourceEl) {
-    syncSourceEl.textContent = adminState.source === 'api'
-      ? `Data source: API (${API_BASE_URL}/bootstrap)`
-      : 'Data source: browser local storage (open this page in the same browser profile as user portal).';
+    const lastSynced = getLastUpdatedTimestamp(records, members, authEvents);
+    const syncSourceEl = document.getElementById('admin-sync-source');
+    if (syncSourceEl) {
+      if (adminState.source === 'api') {
+        syncSourceEl.textContent = `Data source: API (${API_BASE_URL}/bootstrap)`;
+      } else if (adminPendingServerPersistKeys.size > 0) {
+        syncSourceEl.textContent = `Data source: local cache (API unreachable, ${adminPendingServerPersistKeys.size} pending update${adminPendingServerPersistKeys.size === 1 ? '' : 's'} queued for sync).`;
+      } else {
+        syncSourceEl.textContent = 'Data source: local cache (API unreachable).';
+      }
+    }
+
+    setText('admin-active-members', formatNumber(members.length));
+    setText('admin-active-members-sub', `${formatNumber(membersThisMonth)} new this month`);
+    setText('admin-donor-registrations', formatNumber(records.length));
+    setText('admin-donor-registrations-sub', `${formatNumber(totalRelatives)} relatives linked`);
+    setText('admin-monthly-collections', formatMoney(monthlyContributionTotal));
+    setText('admin-monthly-collections-sub', `Since ${new Date(monthStart).toLocaleDateString('en-SG')}`);
+    setText('admin-auth-events-24h', formatNumber(authEvents24h));
+    setText('admin-auth-events-sub', `${formatNumber(authEvents.length)} total auth events`);
+
+    setText('admin-export-donors', formatNumber(records.length));
+    setText('admin-export-relatives', formatNumber(totalRelatives));
+    setText('admin-export-members', formatNumber(members.length));
+    setText('admin-export-auth-events', formatNumber(authEvents.length));
+    setText('admin-export-last-sync', lastSynced ? formatDateTime(lastSynced) : '-');
+
+    renderLatestRegistrations(records);
+    renderActiveSubscribers(records);
+    renderAuthEvents(authEvents);
+  } finally {
+    adminSyncInFlight = false;
   }
-
-  setText('admin-active-members', formatNumber(members.length));
-  setText('admin-active-members-sub', `${formatNumber(membersThisMonth)} new this month`);
-  setText('admin-donor-registrations', formatNumber(records.length));
-  setText('admin-donor-registrations-sub', `${formatNumber(totalRelatives)} relatives linked`);
-  setText('admin-monthly-collections', formatMoney(monthlyContributionTotal));
-  setText('admin-monthly-collections-sub', `Since ${new Date(monthStart).toLocaleDateString('en-SG')}`);
-  setText('admin-auth-events-24h', formatNumber(authEvents24h));
-  setText('admin-auth-events-sub', `${formatNumber(authEvents.length)} total auth events`);
-
-  setText('admin-export-donors', formatNumber(records.length));
-  setText('admin-export-relatives', formatNumber(totalRelatives));
-  setText('admin-export-members', formatNumber(members.length));
-  setText('admin-export-auth-events', formatNumber(authEvents.length));
-  setText('admin-export-last-sync', lastSynced ? formatDateTime(lastSynced) : '-');
-
-  renderLatestRegistrations(records);
-  renderActiveSubscribers(records);
-  renderAuthEvents(authEvents);
 }
 
 function initAdminLiveSync() {
-  refreshAdminDashboard();
+  loadAdminStateFromLocalCache();
+  refreshAdminDashboard({ force: true });
 
   window.addEventListener('storage', event => {
     if (!event.key || ADMIN_SYNC_KEYS.has(event.key)) refreshAdminDashboard();
@@ -1153,6 +1264,10 @@ function initAdminLiveSync() {
     adminSyncChannel.onmessage = () => refreshAdminDashboard();
   }
 
+  window.addEventListener('focus', () => refreshAdminDashboard());
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) refreshAdminDashboard();
+  });
   setInterval(refreshAdminDashboard, 5000);
 }
 

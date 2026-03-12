@@ -958,6 +958,7 @@ def next_application_id() -> dict[str, Any]:
         current = int(get_meta(conn, "donor_counter", 1248))
         next_value = current + 1
         upsert_meta(conn, "donor_counter", str(next_value))
+        upsert_meta(conn, "sync_pulse", {"source": "api", "sourceKey": "counter", "timestamp": iso_now()})
     app_id = f"SP-{datetime.now(timezone.utc).year}-{next_value:04d}"
     return {"counter": next_value, "applicationId": app_id}
 
@@ -968,6 +969,7 @@ def set_counter(payload: CounterPayload) -> dict[str, int]:
         raise HTTPException(status_code=400, detail="Counter must be non-negative")
     with get_conn() as conn:
         upsert_meta(conn, "donor_counter", str(payload.counter))
+        upsert_meta(conn, "sync_pulse", {"source": "api", "sourceKey": "counter", "timestamp": iso_now()})
     return {"counter": payload.counter}
 
 

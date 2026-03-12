@@ -2148,6 +2148,14 @@ let authRegisterClaimContext = null;
 let serverSyncEnabled = false;
 let serverBootstrapLoaded = false;
 let suppressServerPersist = false;
+let serverSyncInFlight = false;
+let serverSyncPollTimer = null;
+let lastServerSyncSignature = '';
+let authInitialized = false;
+const SERVER_SYNC_POLL_INTERVAL_MS = 5000;
+const SERVER_SYNC_KEYS = new Set([...Object.keys(SERVER_SYNC_KEY_ENDPOINTS), DONOR_COUNTER_KEY]);
+const pendingServerPersistKeys = new Set();
+const serverPersistInFlightKeys = new Set();
 let syncChannel = null;
 if ('BroadcastChannel' in window) {
   try {
@@ -2201,38 +2209,74 @@ async function apiRequest(path, options = {}) {
   return response.status === 204 ? null : response.json();
 }
 
-function persistToServerByKey(key, value) {
-  if (!serverSyncEnabled || suppressServerPersist) return;
-
-  if (key === DONOR_COUNTER_KEY) {
-    const counter = Number(value);
-    if (!Number.isFinite(counter)) return;
-    apiRequest('/counter', {
-      method: 'PUT',
-      body: JSON.stringify({ counter: Math.max(0, Math.trunc(counter)) })
-    }).catch(() => {});
-    return;
-  }
-
-  const path = SERVER_SYNC_KEY_ENDPOINTS[key];
-  if (!path) return;
-  apiRequest(path, {
-    method: 'PUT',
-    body: JSON.stringify(value)
-  }).catch(() => {});
+function isServerSyncKey(key) {
+  return SERVER_SYNC_KEYS.has(key);
 }
 
-async function loadServerBootstrapData() {
-  try {
-    const data = await apiRequest('/bootstrap');
-    const users = Array.isArray(data?.users) ? data.users : [];
-    const donorRecords = Array.isArray(data?.donorRecords) ? data.donorRecords : [];
-    const members = Array.isArray(data?.memberDirectory) ? data.memberDirectory : [];
-    const authEvents = Array.isArray(data?.authEvents) ? data.authEvents : [];
-    const donorCounter = Number(data?.donorCounter);
-    const syncPulse = data?.syncPulse || null;
+function buildServerSyncSignature(data) {
+  const pulseTs = String(data?.syncPulse?.timestamp || '');
+  const pulseSource = String(data?.syncPulse?.sourceKey || data?.syncPulse?.source || '');
+  const donorCounter = Number(data?.donorCounter);
+  const counterSig = Number.isFinite(donorCounter) ? Math.max(0, Math.trunc(donorCounter)) : '';
+  const usersLen = Array.isArray(data?.users) ? data.users.length : -1;
+  const donorLen = Array.isArray(data?.donorRecords) ? data.donorRecords.length : -1;
+  const memberLen = Array.isArray(data?.memberDirectory) ? data.memberDirectory.length : -1;
+  const authLen = Array.isArray(data?.authEvents) ? data.authEvents.length : -1;
+  return `${pulseTs}|${pulseSource}|${counterSig}|${usersLen}|${donorLen}|${memberLen}|${authLen}`;
+}
 
-    suppressServerPersist = true;
+function getServerSyncValueByKey(key) {
+  if (key === DONOR_COUNTER_KEY) {
+    return Number(safeReadJson(DONOR_COUNTER_KEY, 1248));
+  }
+  if (key === AUTH_USERS_KEY) {
+    const users = safeReadJson(AUTH_USERS_KEY, []);
+    return Array.isArray(users) ? users : [];
+  }
+  if (key === DONOR_RECORDS_KEY) {
+    const records = safeReadJson(DONOR_RECORDS_KEY, []);
+    return Array.isArray(records) ? records : [];
+  }
+  if (key === MEMBER_DIRECTORY_KEY) {
+    const members = safeReadJson(MEMBER_DIRECTORY_KEY, []);
+    return Array.isArray(members) ? members : [];
+  }
+  if (key === AUTH_EVENTS_KEY) {
+    const events = safeReadJson(AUTH_EVENTS_KEY, []);
+    return Array.isArray(events) ? events : [];
+  }
+  return null;
+}
+
+function refreshAuthFromLocalStore() {
+  const storedUsers = safeReadJson(AUTH_USERS_KEY, []);
+  authUsers = Array.isArray(storedUsers) ? storedUsers : [];
+  const session = safeReadJson(AUTH_SESSION_KEY, null);
+  authCurrentUser = session && session.userId ? getUserById(session.userId) : null;
+  if (session && session.userId && !authCurrentUser) clearSession();
+  if (!authInitialized) return;
+  updateAuthUi();
+  refreshProtectedViews();
+}
+
+function applyServerBootstrapData(data, options = {}) {
+  const users = Array.isArray(data?.users) ? data.users : [];
+  const donorRecords = Array.isArray(data?.donorRecords) ? data.donorRecords : [];
+  const members = Array.isArray(data?.memberDirectory) ? data.memberDirectory : [];
+  const authEvents = Array.isArray(data?.authEvents) ? data.authEvents : [];
+  const donorCounter = Number(data?.donorCounter);
+  const syncPulse = data?.syncPulse || null;
+  const signature = buildServerSyncSignature(data);
+  const force = Boolean(options.force);
+
+  if (!force && signature && signature === lastServerSyncSignature && pendingServerPersistKeys.size === 0) {
+    serverSyncEnabled = true;
+    serverBootstrapLoaded = true;
+    return false;
+  }
+
+  suppressServerPersist = true;
+  try {
     localStorage.setItem(AUTH_USERS_KEY, JSON.stringify(users));
     localStorage.setItem(DONOR_RECORDS_KEY, JSON.stringify(donorRecords));
     localStorage.setItem(MEMBER_DIRECTORY_KEY, JSON.stringify(members));
@@ -2242,18 +2286,132 @@ async function loadServerBootstrapData() {
     }
     if (syncPulse) {
       localStorage.setItem(ADMIN_SYNC_PULSE_KEY, JSON.stringify(syncPulse));
+    } else {
+      localStorage.removeItem(ADMIN_SYNC_PULSE_KEY);
     }
+  } finally {
     suppressServerPersist = false;
+  }
 
+  lastServerSyncSignature = signature;
+  serverSyncEnabled = true;
+  serverBootstrapLoaded = true;
+  notifyAdminSync(options.sourceKey || 'bootstrap');
+  refreshAuthFromLocalStore();
+  return true;
+}
+
+async function persistKeyToServer(key, value) {
+  if (!isServerSyncKey(key) || suppressServerPersist) return true;
+  pendingServerPersistKeys.add(key);
+  if (serverPersistInFlightKeys.has(key)) return false;
+
+  serverPersistInFlightKeys.add(key);
+  try {
+    if (key === DONOR_COUNTER_KEY) {
+      const counter = Number(value);
+      if (!Number.isFinite(counter)) {
+        pendingServerPersistKeys.delete(key);
+        return true;
+      }
+      await apiRequest('/counter', {
+        method: 'PUT',
+        body: JSON.stringify({ counter: Math.max(0, Math.trunc(counter)) })
+      });
+    } else {
+      const path = SERVER_SYNC_KEY_ENDPOINTS[key];
+      if (!path) {
+        pendingServerPersistKeys.delete(key);
+        return true;
+      }
+      await apiRequest(path, {
+        method: 'PUT',
+        body: JSON.stringify(value)
+      });
+    }
+    pendingServerPersistKeys.delete(key);
     serverSyncEnabled = true;
-    serverBootstrapLoaded = true;
-    notifyAdminSync('bootstrap');
     return true;
   } catch (_) {
-    suppressServerPersist = false;
     serverSyncEnabled = false;
-    serverBootstrapLoaded = false;
     return false;
+  } finally {
+    serverPersistInFlightKeys.delete(key);
+  }
+}
+
+async function flushPendingServerWrites() {
+  if (!pendingServerPersistKeys.size) return true;
+  const keys = Array.from(pendingServerPersistKeys);
+  for (const key of keys) {
+    if (serverPersistInFlightKeys.has(key)) return false;
+    const value = getServerSyncValueByKey(key);
+    const ok = await persistKeyToServer(key, value);
+    if (!ok) return false;
+  }
+  return pendingServerPersistKeys.size === 0;
+}
+
+function persistToServerByKey(key, value) {
+  if (!isServerSyncKey(key) || suppressServerPersist) return;
+  pendingServerPersistKeys.add(key);
+  if (!serverSyncEnabled) return;
+  persistKeyToServer(key, value).catch(() => {});
+}
+
+async function syncWithServer(options = {}) {
+  if (serverSyncInFlight || suppressServerPersist) return false;
+  serverSyncInFlight = true;
+  try {
+    if (pendingServerPersistKeys.size > 0) {
+      const flushed = await flushPendingServerWrites();
+      if (!flushed) return false;
+    }
+    const data = await apiRequest('/bootstrap');
+    applyServerBootstrapData(data, {
+      force: Boolean(options.force),
+      sourceKey: options.sourceKey || 'bootstrap'
+    });
+    return true;
+  } catch (_) {
+    serverSyncEnabled = false;
+    return false;
+  } finally {
+    serverSyncInFlight = false;
+  }
+}
+
+async function loadServerBootstrapData() {
+  return syncWithServer({ force: true, sourceKey: 'bootstrap' });
+}
+
+function initServerSync() {
+  if (syncChannel) {
+    syncChannel.onmessage = () => {
+      syncWithServer({ sourceKey: 'broadcast' }).catch(() => {});
+    };
+  }
+
+  window.addEventListener('storage', event => {
+    if (!event.key) return;
+    if (event.key === ADMIN_SYNC_PULSE_KEY || isServerSyncKey(event.key)) {
+      syncWithServer({ sourceKey: 'storage' }).catch(() => {});
+    }
+  });
+
+  window.addEventListener('focus', () => {
+    syncWithServer({ sourceKey: 'focus' }).catch(() => {});
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) return;
+    syncWithServer({ sourceKey: 'visible' }).catch(() => {});
+  });
+
+  if (!serverSyncPollTimer) {
+    serverSyncPollTimer = setInterval(() => {
+      syncWithServer({ sourceKey: 'poll' }).catch(() => {});
+    }, SERVER_SYNC_POLL_INTERVAL_MS);
   }
 }
 
@@ -4990,12 +5148,8 @@ function logout() {
 function initAuth(options = {}) {
   const skipMockSeed = Boolean(options.skipMockSeed);
   if (!skipMockSeed) seedMockTestingData();
-  const storedUsers = safeReadJson(AUTH_USERS_KEY, []);
-  authUsers = Array.isArray(storedUsers) ? storedUsers : [];
+  refreshAuthFromLocalStore();
   ensureMemberDirectoryFromAuthUsers(authUsers);
-  const session = safeReadJson(AUTH_SESSION_KEY, null);
-  authCurrentUser = session && session.userId ? getUserById(session.userId) : null;
-  if (session && session.userId && !authCurrentUser) clearSession();
 
   document.getElementById('auth-open-btn').addEventListener('click', () => openAuthModal('login'));
   document.getElementById('auth-logout-btn').addEventListener('click', logout);
@@ -5009,7 +5163,8 @@ function initAuth(options = {}) {
   document.getElementById('auth-login-singpass').addEventListener('click', continueWithSingpass);
   document.getElementById('auth-register-singpass').addEventListener('click', continueWithSingpass);
 
-  updateAuthUi();
+  authInitialized = true;
+  refreshAuthFromLocalStore();
   syncDonorRecordsToReminderService(getDonorRecords());
   handleSingpassCallback();
 }
@@ -5116,12 +5271,37 @@ function prepareJoinScreen() {
   updateFamilyCounters();
 }
 
-function getNextApplicationId() {
+function getNextApplicationIdFromLocalCounter() {
   const rawCounter = Number(safeReadJson(DONOR_COUNTER_KEY, 1248));
   const counter = Number.isFinite(rawCounter) ? rawCounter : 1248;
   const next = counter + 1;
   safeWriteJson(DONOR_COUNTER_KEY, next);
   return `SP-${new Date().getFullYear()}-${String(next).padStart(4, '0')}`;
+}
+
+async function getNextApplicationId() {
+  if (!serverSyncEnabled) {
+    return getNextApplicationIdFromLocalCounter();
+  }
+
+  try {
+    const data = await apiRequest('/next-application-id', { method: 'POST' });
+    const counter = Number(data?.counter);
+    const applicationId = String(data?.applicationId || '').trim();
+    if (Number.isFinite(counter)) {
+      suppressServerPersist = true;
+      try {
+        localStorage.setItem(DONOR_COUNTER_KEY, JSON.stringify(Math.max(0, Math.trunc(counter))));
+      } finally {
+        suppressServerPersist = false;
+      }
+    }
+    if (applicationId) return applicationId;
+  } catch (_) {
+    serverSyncEnabled = false;
+  }
+
+  return getNextApplicationIdFromLocalCounter();
 }
 
 function valueOf(id) {
@@ -5148,12 +5328,12 @@ function collectOtherAddressMembers() {
   }));
 }
 
-function buildDonorSubmission(existingRecord = null) {
+async function buildDonorSubmission(existingRecord = null) {
   const contribution = getContributionAmount();
   const sameAddressMembers = collectSameAddressMembers();
   const otherAddressMembers = collectOtherAddressMembers();
   const nowIso = new Date().toISOString();
-  const applicationId = existingRecord?.applicationId || getNextApplicationId();
+  const applicationId = existingRecord?.applicationId || await getNextApplicationId();
   const donorNric = valueOf('f-nric');
   const paymentMethod = selPay === 'hitpay' ? 'hitpay' : 'egiro';
   const notifyChannel = getPreferredNotifyChannel(authCurrentUser);
@@ -5289,11 +5469,11 @@ function linkCurrentUserNricFromSubmission(submission) {
   upsertMemberDirectoryFromUser(authCurrentUser, 'submission');
 }
 
-function persistCurrentSubmission() {
+async function persistCurrentSubmission() {
   if (!validateAuthenticatedSubmissionNric()) return null;
   const existingRecord = getJoinMode() === 'edit' ? getLatestMembershipRecord() : null;
   const previousAmount = Number(existingRecord?.donor?.contribution);
-  const submission = buildDonorSubmission(existingRecord);
+  const submission = await buildDonorSubmission(existingRecord);
   const records = getDonorRecords();
   let savedSubmission = submission;
 
@@ -5997,7 +6177,7 @@ async function submitJoin() {
       : '⏳ &nbsp; Submitting...';
   }
 
-  const saved = persistCurrentSubmission();
+  const saved = await persistCurrentSubmission();
   if (!saved) {
     joinSubmitInFlight = false;
     if (submitBtn) {
@@ -6494,6 +6674,8 @@ async function startSkimPintarApp() {
   togglePlusFamilySection();
   updateFamilyCounters();
   initAuth({ skipMockSeed: serverBootstrapLoaded });
+  initServerSync();
+  syncWithServer({ sourceKey: 'startup' }).catch(() => {});
   handleHitPayReturn();
 }
 
